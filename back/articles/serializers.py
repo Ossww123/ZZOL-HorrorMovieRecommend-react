@@ -12,7 +12,7 @@ class MovieListSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 # 특정 영화 출력
-class MoiveSerializer(serializers.ModelSerializer):
+class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = '__all__'

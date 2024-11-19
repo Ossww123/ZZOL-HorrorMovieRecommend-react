@@ -20,6 +20,8 @@
 
   onMounted(() => {
     store.getMovies();
+    console.log(store.movies)
+    console.log('여기는 됬냐?')
   })
 
   

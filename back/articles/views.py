@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from django.shortcuts import get_object_or_404, get_list_or_404
 
-from .serializers import ArticleListSerializer, ArticleSerializer, MovieListSerializer
+from .serializers import ArticleListSerializer, ArticleSerializer, MovieListSerializer, MovieSerializer
 from .models import Article
 
 
@@ -119,3 +119,12 @@ def save_movies_to_db(request):
 
             # 영화와 감독/배우 관계 저장
             movie.save()
+
+@api_view(['GET'])
+def movie_detail(request, movie_pk):
+    movie = get_object_or_404(Movie, pk=movie_pk)
+
+    if request.method == 'GET':
+        serializer = MovieSerializer(movie)
+        print(serializer.data)
+        return Response(serializer.data)
