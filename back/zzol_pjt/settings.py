@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'articles',
     'accounts',
     'movies',
     'rest_framework',
@@ -50,6 +51,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+SITE_ID = 1
+
+REST_FRAMEWORK = {
+    # Authentication
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    # permission
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -61,6 +75,13 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:5173',
+    'http://localhost:5173',
+    'http://127.0.0.1:8000',
+]
+
 
 ROOT_URLCONF = 'zzol_pjt.urls'
 
@@ -136,3 +157,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.User'
+
+# 인증 방법 설정
+ACCOUNT_AUTHENTICATION_METHOD = 'username'  # 이메일, 사용자명, 또는 둘 다
+ACCOUNT_EMAIL_REQUIRED = False  # 이메일이 필수인지
+ACCOUNT_USERNAME_REQUIRED = True  # 사용자명이 필수인지
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # 'optional', 'mandatory', 'none'
+
+# 로그인 후 리디렉션
+LOGIN_REDIRECT_URL = '/'
