@@ -3,12 +3,12 @@
   <div v-if="movie">
     <img :src="'https://image.tmdb.org/t/p/w500' + movie.poster_path" alt="" class="movie-image">
     <img :src="'https://image.tmdb.org/t/p/w500' + movie.backdrop_path" alt="" class="movie-image">
-    <h3>{{  movie.original_title }}</h3>
+    <h3>{{  movie.title }}</h3>
     <p>개봉일: {{  movie.release_date }}</p>
     <p>러닝타임: {{ runtime.runtime }}분</p>
     <p>TMDB 평점: {{ movie.vote_average }} </p>
     <h3>장르</h3>
-    <p>장르 : {{ getGenres(movie.genre_ids) }}</p>
+    <!-- <p>장르 : {{ getGenres(movie.genre_ids) }}</p> -->
     <h3>줄거리</h3>
     <p>{{ movie.overview }}</p>
     <h3>공식 예고편</h3>
@@ -130,16 +130,16 @@ const movie = computed(() => {
   return store.movies.find((movie) => movie.id == movieId)
 })
 
-const getGenres = (genreIds) => {
-  // genreIds 배열을 장르 이름으로 변환
-  const genres = genreIds.map(id => {
-    const genre = genreList.find(g => g.id === id);
-    return genre ? genre.name : null;
-  });
+// const getGenres = (genreIds) => {
+//   // genreIds 배열을 장르 이름으로 변환
+//   const genres = genreIds.map(id => {
+//     const genre = genreList.find(g => g.id === id);
+//     return genre ? genre.name : null;
+//   });
 
-  // 배열의 장르 이름들을 ' / '로 연결
-  return genres.filter(Boolean).join(' / ');
-}
+//   // 배열의 장르 이름들을 ' / '로 연결
+//   return genres.filter(Boolean).join(' / ');
+// }
 
 // 예고편 모달 열기
 const openTrailerModal = () => {

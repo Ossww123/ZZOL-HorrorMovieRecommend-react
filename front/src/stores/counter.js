@@ -102,7 +102,7 @@ export const useCounterStore = defineStore('counter', () => {
       })
   }
   
-  // [추가기능] 로그아웃
+  // [추가기능] 로그아웃 by 준호
   const logOut = function () {
     axios({
       method: 'post',

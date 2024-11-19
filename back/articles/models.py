@@ -1,8 +1,6 @@
 # articles/models.py
 from django.db import models
 from django.conf import settings
-from platform import release
-from tkinter import CASCADE
 from django.db import models
 from django.conf import settings
 
@@ -19,7 +17,7 @@ class Movie(models.Model):
     tmdb_Id = models.IntegerField()
     title = models.CharField(max_length=200)
     original_title = models.CharField(max_length=200)
-    release_date = models.DateTimeField()
+    release_date = models.DateField()
     popularity = models.FloatField()
     tmdb_vote_sum = models.FloatField()
     tmdb_vote_cnt = models.IntegerField()
@@ -27,9 +25,9 @@ class Movie(models.Model):
     user_vote_cnt = models.IntegerField()
     fear_index = models.IntegerField()
     overview = models.TextField()
-    poster_path = models.TextField() 
-    backdrop_path = models.TextField()
-    adult = models.BooleanField()
+    poster_path = models.TextField(blank=True, null=True) 
+    backdrop_path = models.TextField(blank=True, null=True)
+    adult = models.CharField(max_length=50)
     movie_director = models.ManyToManyField(Director)
     movie_actor = models.ManyToManyField(Actor)
 
