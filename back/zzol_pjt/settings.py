@@ -33,8 +33,8 @@ import environ
 
 env = environ.Env(DEBUG=(bool, True))
 environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
-TMDB_API_KEY = env('API_KEY')
-
+TMDB_API_KEY = env('TMDB_KEY')
+OPENAI_API_KEY = env('OPENAI_KEY')
 
 
 
