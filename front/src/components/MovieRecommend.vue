@@ -28,6 +28,7 @@
           <strong>{{ index + 1 }}. {{ movie.title }}</strong>
           <p>출시일: {{ movie.release_date || "N/A" }}</p>
           <p>인기도: {{ movie.popularity }}</p>
+          <img :src="'https://image.tmdb.org/t/p/w500' + movie.poster_path" alt="" class="movie-image">
         </li>
       </ul>
     </div>

@@ -1,5 +1,5 @@
 <template>
-  <h1>추천 영화 출력 페이지(도전 과제)</h1>
+  <h1>추천 영화 출력 페이지</h1>
   <MovieRecommend/>
 </template>
 
