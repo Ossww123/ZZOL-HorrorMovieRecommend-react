@@ -261,7 +261,7 @@ from .serializers import ReviewListSerializer
 def review(request, movie_pk):
     movie = get_object_or_404(Movie, pk=movie_pk)
     if request.method == 'GET':
-        reviews = get_list_or_404(Review)
+        reviews = Review.objects.filter(movie=movie)
         serializer = ReviewListSerializer(reviews, many=True)
         pp(serializer.data)
         return Response(serializer.data)
@@ -302,7 +302,7 @@ def review_update(request, movie_pk, review_pk):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def comment(request, movie_pk):
+def comment(request, review_pk, movie_pk):
     movie = get_object_or_404(Movie, pk=movie_pk)
 
     serializer = CommentSerializer(data=request.data)

@@ -5,8 +5,8 @@
     <img :src="'https://image.tmdb.org/t/p/w500' + movie.backdrop_path" alt="" class="movie-image">
     <h3>{{  movie.title }}</h3>
     <p>개봉일: {{  movie.release_date }}</p>
-    <p>러닝타임: {{ getMovieRuntime(movie.tmdb_Id).runtime }}분</p>
-    <p>TMDB 평점: {{ movie.vote_average }} </p>
+    <p>러닝타임: {{ runtime.runtime }}분</p>
+    <p>TMDB 평점: {{ movie.tmdb_vote_sum }} </p>
     <h3>장르</h3>
     <!-- <p>장르 : {{ getGenres(movie.genre_ids) }}</p> -->
     <h3>줄거리</h3>
@@ -43,17 +43,17 @@ import { useCounterStore } from '@/stores/counter';
 import { onMounted, computed, ref } from 'vue'
 import YoutubeTrailerModal from './YoutubeTrailerModal.vue';
 import MovieDetailReview from '@/components/MovieDetailReview.vue';
-import { RouterLink, RouterView } from 'vue-router'
 
 
 const store = useCounterStore();
 const route = useRoute();
 const movieId = route.params.movie_id;
 const apiKey = import.meta.env.VITE_TMDB;
+const movie = ref(null)
 
 const isLoading = ref(true)
 const isModalVisible = ref(false) // 모달의 열림 상태
-const runtime = ref('')
+const runtime = ref([])
 const keywords = ref('')
 
 import axios from 'axios';
@@ -65,7 +65,7 @@ const getMovieRuntime = async (movieId) => {
     ).then((res) => {
       console.log("222222222까지오나")
       console.log(res.data)
-      runtime.value = response.data.runtime
+      runtime.value = res.data
       console.log(runtime.value)
     })
     .catch((err) => {
@@ -118,11 +118,15 @@ const genreList = [
 
 
 onMounted(async() => {
-  store.getMovies(); // 컴포넌트가 마운트될 때 영화 데이터를 가져옴
-  console.log('Movies in store:', store.movies);  // movies 상태 확인
-  console.log("여기 함수 시작")
-  store.getMovieReviews(movieId)
-  console.log(store.reviews)
+  store.getMovies();
+  console.log('Movies in store:', store.movies); // movies 상태 확인
+  
+  // store.movies에서 해당 movieId에 맞는 영화를 찾음
+  movie.value = store.movies.find((movie) => movie.id == movieId);
+  console.log('영화 데이터:', movie.value);
+
+  // 영화의 러닝타임을 가져옴
+  await getMovieRuntime(movie.value.tmdb_Id);
   
   // const movie = store.movies.find((movie)) movie.id == movieId)
   
@@ -140,9 +144,7 @@ onMounted(async() => {
   
 })
 
-const movie = computed(() => { 
-  return store.movies.find((movie) => movie.id == movieId)
-})
+
 
 // const getGenres = (genreIds) => {
 //   // genreIds 배열을 장르 이름으로 변환

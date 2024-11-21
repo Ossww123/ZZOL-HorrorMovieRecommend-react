@@ -9,6 +9,7 @@ export const useCounterStore = defineStore('counter', () => {
   const articles = ref([])
   const movies = ref([])
   const reviews = ref([])
+  const tmdb_Id = ref()
   const API_URL = 'http://127.0.0.1:8000'
   const token = ref(null)
   const isLogin = computed(() => {
