@@ -23,7 +23,7 @@ class Movie(models.Model):
     popularity = models.FloatField()
     tmdb_vote_sum = models.FloatField()
     tmdb_vote_cnt = models.IntegerField()
-    user_vote_sum = models.IntegerField()
+    user_vote_sum = models.FloatField()
     user_vote_cnt = models.IntegerField()
     fear_index = models.IntegerField()
     overview = models.TextField(blank=True, null=True)
@@ -32,6 +32,33 @@ class Movie(models.Model):
     adult = models.CharField(max_length=50)
     movie_director = models.ManyToManyField(Director)
     movie_actor = models.ManyToManyField(Actor)
+
+    def update_ratings(self):
+        # """리뷰를 기반으로 평점과 공포 지수 업데이트"""
+        reviews = self.review_set.all()
+        
+        if reviews.exists():
+            # 평점 관련 데이터 업데이트
+            self.user_vote_cnt = reviews.count()
+            vote_sum = sum(review.rate for review in reviews)
+            self.user_vote_sum = round(vote_sum / self.user_vote_cnt, 1)
+            
+            # 공포 지수 업데이트
+            total_fear = sum(review.fear_score for review in reviews)
+            self.fear_index = total_fear // self.user_vote_cnt
+        else:
+            # 리뷰가 없는 경우 초기화
+            self.user_vote_cnt = 0
+            self.user_vote_sum = 0
+            self.fear_index = 0
+        
+        self.save()
+
+    def get_average_rating(self):
+        # """평균 평점 계산"""
+        if self.user_vote_cnt > 0:
+            return round(self.user_vote_sum / self.user_vote_cnt, 1)
+        return 0
 
 class Review(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -42,7 +69,14 @@ class Review(models.Model):
     rate = models.IntegerField()
     fear_score = models.IntegerField()
 
-    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.movie.update_ratings()
+
+    def delete(self, *args, **kwargs):
+        movie = self.movie
+        super().delete(*args, **kwargs)
+        movie.update_ratings()
     
 class Comment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

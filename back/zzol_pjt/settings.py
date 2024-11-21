@@ -42,16 +42,23 @@ OPENAI_API_KEY = env('OPENAI_KEY')
 # Application definition
 
 INSTALLED_APPS = [
+    # APP
     'articles',
     'accounts',
+
+    # DRF
     'rest_framework',
     'rest_framework.authtoken',
+
+    # REST_AUTH
     'dj_rest_auth',
-    'corsheaders',
-    'django.contrib.sites',
     'allauth',
     'allauth.account',
+        # social login
     'allauth.socialaccount',
+    'django.contrib.sites',
+
+    'corsheaders',
     'dj_rest_auth.registration',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -170,9 +177,14 @@ AUTH_USER_MODEL = 'accounts.User'
 
 # 인증 방법 설정
 ACCOUNT_AUTHENTICATION_METHOD = 'username'  # 이메일, 사용자명, 또는 둘 다
-ACCOUNT_EMAIL_REQUIRED = False  # 이메일이 필수인지
+ACCOUNT_EMAIL_REQUIRED = True  # 이메일이 필수인지
 ACCOUNT_USERNAME_REQUIRED = True  # 사용자명이 필수인지
-ACCOUNT_EMAIL_VERIFICATION = 'none'  # 'optional', 'mandatory', 'none'
+ACCOUNT_EMAIL_VERIFICATION = "none"  # 'optional', 'mandatory', 'none'
 
 # 로그인 후 리디렉션
 LOGIN_REDIRECT_URL = '/'
+
+# REST-AUTH 회원가입 기본 Serailizer 재정의
+REST_AUTH = {
+    'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
+ }

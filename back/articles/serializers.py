@@ -13,18 +13,38 @@ class MovieListSerializer(serializers.ModelSerializer):
 
 # 특정 영화 출력
 class MovieSerializer(serializers.ModelSerializer):
+    average_rating = serializers.SerializerMethodField()
+    review_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Movie
         fields = '__all__'
 
+    def get_average_rating(self, obj):
+        return obj.get_average_rating()
+
+    def get_review_count(self, obj):
+        return obj.user_vote_cnt
 # 전체 리뷰 출력
 class ReviewListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
 
+#리뷰 출력
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
+        read_only_fields = ('created_at', 'updated_at')
+
 # 전체 댓글 출력
 class CommentListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = '__all__'
