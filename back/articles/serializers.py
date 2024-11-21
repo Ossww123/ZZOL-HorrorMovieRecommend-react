@@ -3,7 +3,13 @@ from rest_framework import serializers
 from .models import Article
 from rest_framework import serializers
 from .models import Movie, Comment, Review
+from django.contrib.auth import get_user_model
 
+# User 시리얼라이저
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()  # 커스터마이징한 User 모델을 사용
+        fields = '__all__'  # 원하는 필드만 포함 (nickname)
 
 # 전체 영화 리스트 출력
 class MovieListSerializer(serializers.ModelSerializer):
@@ -25,18 +31,23 @@ class MovieSerializer(serializers.ModelSerializer):
 
     def get_review_count(self, obj):
         return obj.user_vote_cnt
+    
 # 전체 리뷰 출력
 class ReviewListSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)  # user 정보도 포함되도록 설정
+    
     class Meta:
         model = Review
         fields = '__all__'
 
 #리뷰 출력
 class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)  # user 정보도 포함되도록 설정
+
     class Meta:
         model = Review
         fields = '__all__'
-        read_only_fields = ('created_at', 'updated_at')
+        read_only_fields = ('user', 'movie', 'created_at', 'updated_at')
 
 # 전체 댓글 출력
 class CommentListSerializer(serializers.ModelSerializer):

@@ -8,6 +8,7 @@ import { useRouter } from 'vue-router'
 export const useCounterStore = defineStore('counter', () => {
   const articles = ref([])
   const movies = ref([])
+  const reviews = ref([])
   const API_URL = 'http://127.0.0.1:8000'
   const token = ref(null)
   const isLogin = computed(() => {
@@ -36,6 +37,25 @@ export const useCounterStore = defineStore('counter', () => {
       console.log(err)
     })
   }
+
+  const getMovieReviews = function (movie_pk) {
+    axios.get(`${API_URL}/api/v1/${movie_pk}/reviews/`, {
+      headers: {
+        Authorization: `Token ${token.value}`
+      }
+    })
+    .then((res) => {
+      console.log("이까지오나")
+      console.log(res.data)
+      reviews.value = res.data
+      console.log(reviews.value)
+    })
+    .catch((err) => {
+      console.log("아님여긴가")
+      console.log(err)
+    })
+  }
+  
   
   const getMovies = () => {
     // axios 는 Promise 객체와 동일하게 활용한다.
@@ -53,18 +73,19 @@ export const useCounterStore = defineStore('counter', () => {
     })
   }
 
+
   // 회원가입 요청 액션
   const signUp = function (payload) {
     // const username = payload.username
     // const password1 = payload.password1
     // const password2 = payload.password2
-    const { username, password1, password2 } = payload
+    const { username, email, password1, password2, nickname } = payload
 
     axios({
       method: 'post',
       url: `${API_URL}/accounts/signup/`,
       data: {
-        username, password1, password2
+        username, email, password1, password2, nickname
       }
     })
       .then((res) => {
@@ -135,7 +156,7 @@ export const useCounterStore = defineStore('counter', () => {
     return movie
   }
 
-  return { articles, API_URL, getArticles, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById  }
+  return { articles, API_URL, reviews, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById  }
 }, { persist: true })
 
 

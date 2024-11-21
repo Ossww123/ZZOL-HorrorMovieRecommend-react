@@ -30,7 +30,6 @@ def article_list(request):
     if request.method == 'GET':
         articles = get_list_or_404(Article)
         serializer = ArticleListSerializer(articles, many=True)
-        pp(serializer.data)
         return Response(serializer.data)
 
     elif request.method == 'POST':
@@ -85,7 +84,6 @@ def save_movies_to_db(request):
             movies_data = fetch_movies_from_tmdb(num)
 
             for movie_data in movies_data:
-                print(movie_data)
                 release_date = movie_data.get('release_date', '0001-01-01') or '0001-01-01'
 
                 # 영화 데이터 저장
@@ -256,25 +254,38 @@ def get_movies_by_keywords(keywords, allowed_genres):
     return sorted(filtered_movies, key=lambda x: x.get('popularity', 0), reverse=True)[:5]
 
 
-@api_view(['POST'])
+from .serializers import ReviewListSerializer
+
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def review(request, movie_pk):
     movie = get_object_or_404(Movie, pk=movie_pk)
+    if request.method == 'GET':
+        reviews = get_list_or_404(Review)
+        serializer = ReviewListSerializer(reviews, many=True)
+        pp(serializer.data)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        print("11111111111111111111111111111111111111111111111111")
+        if Review.objects.filter(user=request.user, movie=movie).exists():
+            return Response({'error' : '나가 임마'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        print("22222222222222222222222222222222222222222222222222")
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            print("22222222222222222222222222222222222222222222222222")
+            serializer.save(user=request.user, movie=movie)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    if Review.objects.filter(user=request.user, movie=movie).exists():
-        return Response({'error' : '나가 임마'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    serializer = ReviewSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
-        serializer.save(user=request.user, movie=movie)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+@api_view(['PUT', 'DELETE'])    
 @permission_classes([IsAuthenticated])
-def review_detail(request, movie_pk, review_pk):
+def review_update(request, movie_pk, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
-    
+    print("4444444444444444444444444444444444444444444444")
     # 리뷰 작성자만 수정/삭제 가능
     if review.user != request.user:
+        print("니니니가가가뭔뭔무넏ㄷ[ㄷ]")
         return Response({'error': '니가 뭔데'}, 
                       status=status.HTTP_403_FORBIDDEN)
 
@@ -285,6 +296,7 @@ def review_detail(request, movie_pk, review_pk):
             return Response(serializer.data)
 
     elif request.method == 'DELETE':
+        print("4444444444444444444444444444444444444444444444")
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
