@@ -181,3 +181,5 @@ REST_AUTH = {
  }
 
 ACCOUNT_ADAPTER  = 'accounts.models.CustomAccountAdapter'
+
+DEFAULT_CHARSET = 'utf-8'
