@@ -1,28 +1,23 @@
-<!-- src/views/LoginView.vue -->
+<!-- src/views/LogInView.vue -->
 <template>
-  <div class="login-container">
-    <div class="form-container">
-      <!-- 바깥쪽 반투명 컨테이너 추가 -->
-      <div class="outer-box">
-        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-          <h1 class="text-3xl font-bold text-center mb-6">Log In</h1>
-          <form @submit.prevent="logIn">
-            <div class="mb-4">
-              <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-              <input type="text" id="username" v-model.trim="username" class="w-full p-2 mt-2 border border-gray-300 rounded-lg" placeholder="Enter your username">
-            </div>
-
-            <div class="mb-6">
-              <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-              <input type="password" id="password" v-model.trim="password" class="w-full p-2 mt-2 border border-gray-300 rounded-lg" placeholder="Enter your password">
-            </div>
-
-            <div class="flex justify-center">
-              <input type="submit" value="Log In" class="w-full p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 cursor-pointer">
-            </div>
-          </form>
-        </div>
-      </div>
+  <div class="container">
+    <div class="login-form">
+      <h1>Log In</h1>
+      <form @submit.prevent="logIn">
+        <!-- Username -->
+        <label for="username">Username: </label>
+        <input type="text" id="username" v-model.trim="username" />
+        
+        <!-- Password -->
+        <label for="password">Password: </label>
+        <input type="password" id="password" v-model.trim="password" />
+        
+        <!-- Submit Button -->
+        <input type="submit" value="Log In" :disabled="isSubmitting" />
+        
+        <!-- 로딩 스피너 -->
+        <div v-if="isSubmitting" class="spinner"></div>
+      </form>
     </div>
   </div>
 </template>
@@ -46,36 +41,95 @@ const logIn = function () {
 </script>
 
 <style scoped>
-.login-container {
-  min-height: calc(100vh - 64px);
-  width: 100%;
-  background-image: url('/images/image.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+/* 오류 메시지 스타일 */
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
 }
 
-.form-container {
-  min-height: inherit;
+/* 전체 화면을 채운 div */
+.container {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
+  height: 100vh;
+  background-color: black;
 }
 
-/* 바깥쪽 반투명 박스 스타일 */
-.outer-box {
-  background-color: rgba(255, 255, 255, 0.15); /* 반투명 흰색 배경 */
-  backdrop-filter: blur(8px); /* 블러 효과 추가 */
-  border-radius: 20px; /* 둥근 모서리 */
-  padding: 2rem; /* 내부 여백 */
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* 그림자 효과 */
-  border: 1px solid rgba(255, 255, 255, 0.18); /* 미세한 테두리 */
+/* 로그인 폼 스타일 */
+.login-form {
+  background-color: white;
+  border: 2px solid #ccc;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
-/* 내부 폼 컨테이너의 그림자 조정 */
-.bg-white {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
-              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+/* 폼 요소들에 대한 스타일 */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+h1 {
+  color: black;
+  text-align: center;
+}
+
+label {
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: black;
+}
+
+input {
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  color: black;
+}
+
+input[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+input[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+input[type="submit"]:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* 로딩 스피너 스타일 */
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 10px auto;
+}
+
+/* 스피너 회전 애니메이션 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

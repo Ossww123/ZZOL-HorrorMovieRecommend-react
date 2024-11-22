@@ -51,7 +51,7 @@ const store = useCounterStore();
 const route = useRoute();
 const movieId = route.params.movie_id;
 const apiKey = import.meta.env.VITE_TMDB;
-const movie = ref(null)
+// const movie = ref(null)
 
 const isLoading = ref(true)
 const isModalVisible = ref(false) // 모달의 열림 상태
