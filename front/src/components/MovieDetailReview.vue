@@ -87,6 +87,7 @@
       })
       .then(async (res) => {
         console.log("제발 됬다고 말해")
+        window.alert('성공!')
         content.value = ''
         rate.value = null
         fear_score.value = null
