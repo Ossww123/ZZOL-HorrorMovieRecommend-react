@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from openai import OpenAI
 from .models import Article, Movie, Director, Actor, Comment, Review
-from .serializers import ArticleListSerializer, ArticleSerializer, MovieListSerializer, MovieSerializer, ReviewSerializer, CommentSerializer
+from .serializers import ArticleListSerializer, ArticleSerializer, CommentListSerializer, MovieListSerializer, MovieSerializer, ReviewSerializer, CommentSerializer
 
 # TMDB API 설정
 TMDB_API_URL = 'https://api.themoviedb.org/3'
@@ -267,25 +267,20 @@ def review(request, movie_pk):
         return Response(serializer.data)
     
     elif request.method == 'POST':
-        print("11111111111111111111111111111111111111111111111111")
         if Review.objects.filter(user=request.user, movie=movie).exists():
             return Response({'error' : '나가 임마'}, status=status.HTTP_400_BAD_REQUEST)
         
-        print("22222222222222222222222222222222222222222222222222")
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            print("22222222222222222222222222222222222222222222222222")
             serializer.save(user=request.user, movie=movie)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 @api_view(['PUT', 'DELETE'])    
 @permission_classes([IsAuthenticated])
 def review_update(request, movie_pk, review_pk):
-    review = get_object_or_404(Review, pk=review_pk)
-    print("4444444444444444444444444444444444444444444444")
+    review = Review.objects.get(pk=review_pk)
     # 리뷰 작성자만 수정/삭제 가능
     if review.user != request.user:
-        print("니니니가가가뭔뭔무넏ㄷ[ㄷ]")
         return Response({'error': '니가 뭔데'}, 
                       status=status.HTTP_403_FORBIDDEN)
 
@@ -296,28 +291,34 @@ def review_update(request, movie_pk, review_pk):
             return Response(serializer.data)
 
     elif request.method == 'DELETE':
-        print("4444444444444444444444444444444444444444444444")
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
-def comment(request, review_pk, movie_pk):
-    movie = get_object_or_404(Movie, pk=movie_pk)
-
-    serializer = CommentSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
-        serializer.save(user=request.user, movie=movie)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+def comment(request, review_pk):
+    # 1개의 리뷰에 댓글이 달릴거니까 가져오고
+    review = get_object_or_404(Review, pk=review_pk)
+    # get이면 리뷰에 달린 댓글을 출력합니다.
+    if request.method == 'GET':
+        comments = Comment.objects.filter(review=review)
+        serializer = CommentListSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    # post면 리뷰에 댓글을 생성합니다.
+    elif request.method == 'POST':
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user, review=review)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
     
 @api_view(['PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def comment_detail(request, movie_pk, comment_pk):
+def comment_update(request, review_pk, comment_pk):
     comment = get_object_or_404(Comment, pk=comment_pk)
     
     # 리뷰 작성자만 수정/삭제 가능
     if comment.user != request.user:
-        return Response({'error': '니가 뭔데'}, 
+        return Response({'error': '니가 뭔데 여길 와'}, 
                       status=status.HTTP_403_FORBIDDEN)
 
     if request.method == 'PUT':

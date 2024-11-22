@@ -51,14 +51,26 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 # 전체 댓글 출력
 class CommentListSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
     class Meta:
         model = Comment
         fields = '__all__'
+        read_only_fields = ('user', )
+    
+    def get_user(self, obj):
+        return {
+            'id': obj.user.id,
+            'nickname': obj.user.nickname
+        }
 
 class CommentSerializer(serializers.ModelSerializer):
+    user_nickname = serializers.CharField(source='user.nickname', read_only=True)
+    
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ('content', 'user_nickname', )
+        read_only_fields = ('user', )
 
 class ArticleListSerializer(serializers.ModelSerializer):
     class Meta:

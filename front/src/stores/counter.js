@@ -8,8 +8,9 @@ import { useRouter } from 'vue-router'
 export const useCounterStore = defineStore('counter', () => {
   const articles = ref([])
   const movies = ref([])
+  const movieDetail = ref([])
   const reviews = ref([])
-  const tmdb_Id = ref()
+  const comments = ref([])
   const API_URL = 'http://127.0.0.1:8000'
   const token = ref(null)
   const isLogin = computed(() => {
@@ -39,6 +40,7 @@ export const useCounterStore = defineStore('counter', () => {
     })
   }
 
+  // 영화 리뷰 가져와서 reviews에 저장하는 함수
   const getMovieReviews = function (movie_pk) {
     axios.get(`${API_URL}/api/v1/${movie_pk}/reviews/`, {
       headers: {
@@ -56,8 +58,27 @@ export const useCounterStore = defineStore('counter', () => {
       console.log(err)
     })
   }
+
+  // 리뷰에 대한 댓글 가져와서 comments에 저장하는 함수
+  const getReviewComments = function (review_pk) {
+    axios.get(`${API_URL}/api/v1/${review_pk}/comments/`, {
+      headers: {
+        Authorization: `Token ${token.value}`
+      }
+    })
+    .then((res) => {
+      console.log('여기 댓글 있어요')
+      console.log(res.data)
+      comments.value = res.data
+      console.log(comments.value)
+    })
+    .catch((err) => {
+      console.log('댓글 에러')
+      console.log(err)
+    })
+  }
   
-  
+  // 영화 정보 가져와서 movies에 저장하는 함수
   const getMovies = () => {
     // axios 는 Promise 객체와 동일하게 활용한다.
     axios.get(`${API_URL}/api/v1/movies/`, {
@@ -69,6 +90,23 @@ export const useCounterStore = defineStore('counter', () => {
       console.log(response.data);
       // console.log('Movies fetched = ', response.data);
       movies.value = response.data;
+    }).catch((error) => {
+      console.log("error = ", error);
+    })
+  }
+
+  const getMovieDetail = (movie_pk) => {
+    // axios 는 Promise 객체와 동일하게 활용한다.
+    axios.get(`${API_URL}/api/v1/movies/${movie_pk}/`, {
+      headers: {
+        Authorization: `Token ${token.value}`,
+      },
+    })
+    .then((response) => {
+      console.log(response.data);
+      // console.log('Movies fetched = ', response.data);
+      movieDetail.value = response.data
+      console.log(movieDetail.value);
     }).catch((error) => {
       console.log("error = ", error);
     })
@@ -157,7 +195,5 @@ export const useCounterStore = defineStore('counter', () => {
     return movie
   }
 
-  return { articles, API_URL, reviews, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById  }
+  return { articles, API_URL, reviews, comments, getReviewComments, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById, getMovieDetail, movieDetail  }
 }, { persist: true })
-
-

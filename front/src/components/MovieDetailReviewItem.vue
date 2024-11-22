@@ -7,7 +7,10 @@
     <p>fear_score: {{ review.fear_score }}</p>
     <p>content: {{ review.content }}</p>
     <button @click="deleteReview(movie_pk, review.id)">삭제</button>
-    <hr>
+    <ReviewCommentsList 
+    :review_pk="review.id"
+    :movie_pk="movie_pk"
+    />
     <hr>
   </div>
 </template>
@@ -15,6 +18,8 @@
 <script setup>
 import axios from 'axios';
 import { useCounterStore } from '@/stores/counter';
+import ReviewCommentsList from './ReviewCommentsList.vue';
+
 
 const store = useCounterStore();
 
@@ -33,6 +38,8 @@ const deleteReview = function (movie_pk, reviewId) {
       })
       .then((res) => {
         console.log("제발 됬다고 말해222222")
+        store.getMovieReviews(movie_pk)
+        store.getMovies()
       })
       .catch((err) => {
         console.log("응 안돼 돌아가22222")

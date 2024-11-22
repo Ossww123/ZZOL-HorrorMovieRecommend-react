@@ -28,26 +28,15 @@ import { useCounterStore } from '@/stores/counter'
 
 const username = ref(null)
 const password = ref(null)
-const isSubmitting = ref(false)
-
 
 const store = useCounterStore()
 
-const logIn = async () => {
-  isSubmitting.value = true
+const logIn = function () {
   const payload = {
     username: username.value,
     password: password.value
   }
-  
-  try {
-    await store.logIn(payload)
-    // 로그인 성공 후 처리 (예: 성공 메시지, 리디렉션 등)
-  } catch (error) {
-    // 에러 처리 (예: 로그인 실패 메시지 등)
-  } finally {
-    isSubmitting.value = false
-  }
+  store.logIn(payload)
 }
 </script>
 
