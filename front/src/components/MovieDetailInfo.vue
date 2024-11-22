@@ -14,10 +14,11 @@
     <h3>공식 예고편</h3>
     <p>{{ movie.overview }}</p>
     <p>{{ movie }}</p>
-    <p>{{ keywords.keywords }}</p>
+    <!--<p>{{ keywords.keywords }}</p>-->
     <button @click="openTrailerModal">예고편 보기</button>
     <p>{{ movie.user_vote_sum }}  ({{ movie.user_vote_cnt }})</p>
     <p>{{ movie.fear_index }}</p>
+    <p>{{ movie }}</p>
     <YoutubeTrailerModal
       v-if="isModalVisible"
       :showModal="isModalVisible"
@@ -34,6 +35,7 @@
   </div>
   <MovieDetailReview
   :movie_pk="movieId"
+  @reviewCreated="updateMovieData"
   />
 </template>
 
@@ -120,18 +122,19 @@ const genreList = [
 onMounted(async() => {
   store.getMovies();
   console.log('Movies in store:', store.movies); // movies 상태 확인
-  
+  store.getMovieDetail(movieId)
+  movie.value = store.movieDetail
+  store.getMovieReviews(movieId)
   // store.movies에서 해당 movieId에 맞는 영화를 찾음
-  movie.value = store.movies.find((movie) => movie.id == movieId);
-  console.log('영화 데이터:', movie.value);
+
 
   // 영화의 러닝타임을 가져옴
   await getMovieRuntime(movie.value.tmdb_Id);
   
   // const movie = store.movies.find((movie)) movie.id == movieId)
   
-  const movieKeywords = await getKeyword(movieId);
-  keywords.value = movieKeywords; // 영화의 러닝타임을 상태에 저장
+  // const movieKeywords = await getKeyword(movieId);
+  // keywords.value = movieKeywords; // 영화의 러닝타임을 상태에 저장
   
   // movies가 비어있지 않으면 로딩 상태 false로 설정
   const interval = setInterval(() => {
@@ -144,7 +147,11 @@ onMounted(async() => {
   
 })
 
-
+const updateMovieData = async () => {
+  store.getMovieReviews(movieId)  // 해당 영화의 리뷰 업데이트
+  store.getMovies()  // 전체 영화 정보 업데이트
+  store.getMovieDetail(movieId)
+}
 
 // const getGenres = (genreIds) => {
 //   // genreIds 배열을 장르 이름으로 변환

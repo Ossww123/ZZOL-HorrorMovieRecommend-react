@@ -28,7 +28,21 @@
 </template>
 
 <script setup>
-// script 부분은 동일
+import { ref } from 'vue'
+import { useCounterStore } from '@/stores/counter'
+
+const username = ref(null)
+const password = ref(null)
+
+const store = useCounterStore()
+
+const logIn = function () {
+  const payload = {
+    username: username.value,
+    password: password.value
+  }
+  store.logIn(payload)
+}
 </script>
 
 <style scoped>

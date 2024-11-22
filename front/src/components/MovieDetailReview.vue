@@ -39,6 +39,7 @@
 
         <input type="submit" value="제출">
     </form>
+    <hr>
   </div>
   <MovieDetailReviewItem
       v-for="review in store.reviews"
@@ -46,7 +47,6 @@
       :review="review"
       :movie_pk="movie_pk"
     />
-    
   </div>
 </template>
 
@@ -64,9 +64,13 @@
   const fear_score = ref(null)
   const router = useRouter()
 
+  const emit = defineEmits(['reviewCreated'])
+
   defineProps({
     movie_pk: String
   })
+
+  
 
   const createReview = function (movie_pk) {
       axios({
@@ -81,8 +85,12 @@
           Authorization: `Token ${store.token}`
         }
       })
-      .then((res) => {
+      .then(async (res) => {
         console.log("제발 됬다고 말해")
+        content.value = ''
+        rate.value = null
+        fear_score.value = null
+        emit('reviewCreated')
       })
       .catch((err) => {
         console.log("응 안돼 돌아가")
