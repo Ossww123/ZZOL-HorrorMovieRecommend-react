@@ -93,8 +93,9 @@
         emit('reviewCreated')
       })
       .catch((err) => {
-        console.log("응 안돼 돌아가")
-        console.log(err)
+        if (err.response.data.error) {
+      alert(err.response.data.error)
+    }
       })
     }
 

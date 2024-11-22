@@ -20,6 +20,55 @@ from .serializers import ArticleListSerializer, ArticleSerializer, CommentListSe
 TMDB_API_URL = 'https://api.themoviedb.org/3'
 TMDB_API_KEY = settings.TMDB_API_KEY
 
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
+
+
+def check_spoiler(content):
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "영화 리뷰의 스포일러 여부를 판단하는 AI입니다. 스포일러가 있으면 True, 없으면 False를 반환하세요."
+                },
+                {
+                    "role": "user",
+                    "content": f"다음 리뷰가 스포일러를 포함하고 있는지 True/False로만 답변하세요: {content}"
+                }
+            ],
+            max_tokens=10,
+            temperature=0.3
+        )
+        return response.choices[0].message.content.strip().lower() == 'true'
+    except Exception as e:
+        print(f"스포일러 체크 오류: {str(e)}")
+        return False
+
+
+def check_inappropriate_content(content):
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "댓글의 욕설이나 혐오발언 여부를 판단하는 AI입니다. 부적절한 내용이 있으면 True, 없으면 False를 반환하세요."
+                },
+                {
+                    "role": "user",
+                    "content": f"다음 댓글이 욕설이나 혐오발언을 포함하고 있는지 True/False로만 답변하세요: {content}"
+                }
+            ],
+            max_tokens=10,
+            temperature=0.3
+        )
+        return response.choices[0].message.content.strip().lower() == 'true'
+    except Exception as e:
+        print(f"부적절 내용 체크 오류: {str(e)}")
+        return False
+
+
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -146,7 +195,6 @@ def movie_detail(request, movie_pk):
     return Response(serializer.data)
 
 
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 
 @csrf_exempt
@@ -270,6 +318,10 @@ def review(request, movie_pk):
         if Review.objects.filter(user=request.user, movie=movie).exists():
             return Response({'error' : '나가 임마'}, status=status.HTTP_400_BAD_REQUEST)
         
+        if check_spoiler(request.data['content']):
+            return Response({'error': '스포일러가 포함된 리뷰는 작성할 수 없습니다'}, 
+                       status=status.HTTP_400_BAD_REQUEST)
+
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(user=request.user, movie=movie)
@@ -306,6 +358,11 @@ def comment(request, review_pk):
         return Response(serializer.data, status=status.HTTP_200_OK)
     # post면 리뷰에 댓글을 생성합니다.
     elif request.method == 'POST':
+        if check_inappropriate_content(request.data['content']):
+            return Response({'error': '부적절한 내용이 포함된 댓글은 작성할 수 없습니다'}, 
+                       status=status.HTTP_400_BAD_REQUEST)
+
+
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(user=request.user, review=review)

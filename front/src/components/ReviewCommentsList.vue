@@ -57,7 +57,9 @@ const createComment = function (review_pk) {
     store.getReviewComments(review_pk)
   })
   .catch((err) => {
-    console.log('댓글 생성안됨..')
+    if (err.response.data.error) {
+    alert(err.response.data.error)
+    }
   })
 }
 

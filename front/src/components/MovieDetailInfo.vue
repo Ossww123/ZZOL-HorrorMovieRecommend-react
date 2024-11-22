@@ -13,7 +13,7 @@
     <p>{{ movie.overview }}</p>
     <h3>공식 예고편</h3>
     <p>{{ movie.overview }}</p>
-    <p>{{ movie }}</p>
+    <h3>키워드</h3>
     <p v-for="keyword in keywords.keywords">{{ keyword.name }}</p>
     <button @click="openTrailerModal">예고편 보기</button>
     <p>{{ movie.user_vote_sum }}  ({{ movie.user_vote_cnt }})</p>
