@@ -43,6 +43,7 @@ const deleteReview = function (movie_pk, reviewId) {
       })
       .catch((err) => {
         console.log("응 안돼 돌아가22222")
+        console.log(movie_pk, reviewId)
         console.log(err)
       })
     }

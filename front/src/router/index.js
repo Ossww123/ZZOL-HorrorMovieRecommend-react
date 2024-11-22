@@ -10,13 +10,18 @@ import MovieDetailView from '@/views/MovieDetailView.vue'
 import MovieListView from '@/views/MovieListView.vue'
 import ReviewSearchView from '@/views/ReviewSearchView.vue'
 import RecommendedView from '@/views/RecommendedView.vue'
-
+import HomeView from '@/views/HomeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
+      name: 'HomeView',
+      component: HomeView
+    },
+    {
+      path: '/articles',
       name: 'ArticleView',
       component: ArticleView
     },
@@ -60,6 +65,9 @@ const router = createRouter({
   ]
 })
 
+// 로그인 관련 페이지 막기 일단 주석 처리하기
+
+/*
 router.beforeEach((to, from) => {
   const store = useCounterStore()
   // 만약 이동하는 목적지가 메인 페이지이면서
@@ -76,5 +84,5 @@ router.beforeEach((to, from) => {
     return { name: 'ArticleView' }
   }
 })
-
+*/
 export default router
