@@ -4,7 +4,8 @@
     <RouterLink v-if="!isLoggedIn" :to="{ name: 'SignUpView' }">SignUpView</RouterLink> |
     <RouterLink v-if="!isLoggedIn" :to="{ name: 'LogInView' }">LogInView</RouterLink> | 
     <RouterLink to="/movies">Movies</RouterLink> |
-    <RouterLink to="/review-search">리뷰 검색</RouterLink>
+    <RouterLink to="/review-search">리뷰 검색</RouterLink> |
+    <RouterLink to="/recommended">영화 추천</RouterLink>
     <div v-if="isLoggedIn">
       <form @submit.prevent="logOut">
         <input type="submit" value="Logout">

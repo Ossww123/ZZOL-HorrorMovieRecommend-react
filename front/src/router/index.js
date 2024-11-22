@@ -46,6 +46,7 @@ const router = createRouter({
     },
     {
       path: '/:movie_id',
+      name: 'MovieDetailView',
       component: MovieDetailView
     },
     {
