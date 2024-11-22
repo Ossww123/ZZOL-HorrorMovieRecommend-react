@@ -14,7 +14,7 @@
     <h3>공식 예고편</h3>
     <p>{{ movie.overview }}</p>
     <p>{{ movie }}</p>
-    <!--<p>{{ keywords.keywords }}</p>-->
+    <p v-for="keyword in keywords.keywords">{{ keyword.name }}</p>
     <button @click="openTrailerModal">예고편 보기</button>
     <p>{{ movie.user_vote_sum }}  ({{ movie.user_vote_cnt }})</p>
     <p>{{ movie.fear_index }}</p>
@@ -51,12 +51,12 @@ const store = useCounterStore();
 const route = useRoute();
 const movieId = route.params.movie_id;
 const apiKey = import.meta.env.VITE_TMDB;
-// const movie = ref(null)
+const movie = ref(null)
 
 const isLoading = ref(true)
 const isModalVisible = ref(false) // 모달의 열림 상태
 const runtime = ref([])
-const keywords = ref('')
+const keywords = ref([])
 
 import axios from 'axios';
 
@@ -84,11 +84,9 @@ const getKeyword = async (movieId) => {
   const response = await axios.get(
       `https://api.themoviedb.org/3/movie/${movieId}/keywords?api_key=${apiKey}`
     );
-    const movieKeyword = response.data
     console.log('여기에요')
-    console.log(movieKeyword)
-
-    return movieKeyword
+    keywords.value = response.data
+    console.log(keywords.value)
 }
 
 
@@ -133,7 +131,7 @@ onMounted(async() => {
   
   // const movie = store.movies.find((movie)) movie.id == movieId)
   
-  // const movieKeywords = await getKeyword(movieId);
+  await getKeyword(movieId);
   // keywords.value = movieKeywords; // 영화의 러닝타임을 상태에 저장
   
   // movies가 비어있지 않으면 로딩 상태 false로 설정
