@@ -436,3 +436,22 @@ def random_movie(request):
         movies = response.json()['results'][:8]
         results[horror_keywords[keyword]['name']] = movies
     return Response(results)
+
+
+@api_view(['GET'])
+def director_info(request, director_pk):
+    director = get_object_or_404(Director, pk=director_pk)
+    return Response({
+        'name': director.name,
+        'original_name': director.original_name,
+        'profile_path': director.profile_path
+    })
+
+@api_view(['GET'])
+def actor_info(request, actor_pk):
+    actor = get_object_or_404(Actor, pk=actor_pk)
+    return Response({
+        'name': actor.name,
+        'original_name': actor.original_name,
+        'profile_path': actor.profile_path
+    })
