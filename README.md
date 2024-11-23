@@ -57,3 +57,21 @@ model 설정 중 중단
 
 
 ---
+
+2024.11.23 21:35
+
+만진거
+App.vue
+LogInView.vue
+SignUpView.vue
+MovieRecommend.vue
+MovieDetailInfo.vue
+ReviewSearchView.vue
+ArticleView.vue
+ArticleList.vue
+ArticleListItem.vue
+
+Canvas.vue 추가
+
+공포 테마의 CSS 추가
+추천 알고리즘에 이미지 돌아가게 하는거에 시간 갈아넣음
