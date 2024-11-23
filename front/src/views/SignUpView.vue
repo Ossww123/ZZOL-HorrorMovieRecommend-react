@@ -1,53 +1,117 @@
 <!--SignUpView.vue-->
 <template>
-  <div class="container">
-    <div class="signup-form">
-      <h1>Sign Up Page</h1>
-      <form @submit.prevent="signUp">
+  <div class="w-full max-w-md p-6">
+    <div class="bg-white rounded-xl shadow-lg p-8">
+      <h1 class="text-2xl font-bold text-black text-center mb-6">
+        Sign Up Page
+      </h1>
+
+      <form @submit.prevent="signUp" class="flex flex-col gap-4">
         <!-- Username -->
-        <label for="username">username : </label>
-        <input type="text" id="username" v-model.trim="username">
-        <p v-if="errors.username" class="error">{{ errors.username }}</p>
+        <div class="flex flex-col">
+          <label for="username" class="text-sm text-black mb-1"
+            >username :
+          </label>
+          <input
+            type="text"
+            id="username"
+            v-model.trim="username"
+            class="p-2 border border-gray-300 rounded-md text-black"
+          />
+          <p v-if="errors.username" class="text-red-500 text-xs mt-1">
+            {{ errors.username }}
+          </p>
+        </div>
 
         <!-- Email -->
-        <label for="email">email : </label>
-        <input type="text" id="email" v-model.trim="email">
-        <p v-if="errors.email" class="error">{{ errors.email }}</p>
+        <div class="flex flex-col">
+          <label for="email" class="text-sm text-black mb-1">email : </label>
+          <input
+            type="text"
+            id="email"
+            v-model.trim="email"
+            class="p-2 border border-gray-300 rounded-md text-black"
+          />
+          <p v-if="errors.email" class="text-red-500 text-xs mt-1">
+            {{ errors.email }}
+          </p>
+        </div>
 
         <!-- Password -->
-        <label for="password1">password : </label>
-        <input type="password" id="password1" v-model.trim="password1">
-        <p v-if="errors.password1" class="error">{{ errors.password1 }}</p>
+        <div class="flex flex-col">
+          <label for="password1" class="text-sm text-black mb-1"
+            >password :
+          </label>
+          <input
+            type="password"
+            id="password1"
+            v-model.trim="password1"
+            class="p-2 border border-gray-300 rounded-md text-black"
+          />
+          <p v-if="errors.password1" class="text-red-500 text-xs mt-1">
+            {{ errors.password1 }}
+          </p>
+        </div>
 
         <!-- Password confirmation -->
-        <label for="password2">password confirmation : </label>
-        <input type="password" id="password2" v-model.trim="password2">
-        <p v-if="errors.password2" class="error">{{ errors.password2 }}</p>
+        <div class="flex flex-col">
+          <label for="password2" class="text-sm text-black mb-1"
+            >password confirmation :
+          </label>
+          <input
+            type="password"
+            id="password2"
+            v-model.trim="password2"
+            class="p-2 border border-gray-300 rounded-md text-black"
+          />
+          <p v-if="errors.password2" class="text-red-500 text-xs mt-1">
+            {{ errors.password2 }}
+          </p>
+        </div>
 
         <!-- Nickname -->
-        <label for="nickname">nickname : </label>
-        <input type="text" id="nickname" v-model.trim="nickname">
-        <p v-if="errors.nickname" class="error">{{ errors.nickname }}</p>
+        <div class="flex flex-col">
+          <label for="nickname" class="text-sm text-black mb-1"
+            >nickname :
+          </label>
+          <input
+            type="text"
+            id="nickname"
+            v-model.trim="nickname"
+            class="p-2 border border-gray-300 rounded-md text-black"
+          />
+          <p v-if="errors.nickname" class="text-red-500 text-xs mt-1">
+            {{ errors.nickname }}
+          </p>
+        </div>
 
         <!-- Submit Button -->
-        <input type="submit" value="SignUp" :disabled="isSubmitting">
-        
+        <input
+          type="submit"
+          value="SignUp"
+          :disabled="isSubmitting"
+          class="bg-green-500 text-white py-2 px-4 rounded-md cursor-pointer hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed mt-4"
+        />
+
         <!-- 로딩 스피너 -->
-        <div v-if="isSubmitting" class="spinner"></div>
+        <div v-if="isSubmitting" class="flex justify-center">
+          <div
+            class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"
+          ></div>
+        </div>
       </form>
     </div>
   </div>
 </template>
-
 <script setup>
-import { ref } from 'vue'
-import { useCounterStore } from '@/stores/counter'
+import { ref } from "vue";
+import { useCounterStore } from "@/stores/counter";
 
-const username = ref(null)
-const email = ref(null)
-const password1 = ref(null)
-const password2 = ref(null)
-const nickname = ref(null)
+const username = ref(null);
+const email = ref(null);
+const password1 = ref(null);
+const password2 = ref(null);
+const nickname = ref(null);
 
 const errors = ref({
   username: null,
@@ -55,27 +119,27 @@ const errors = ref({
   password1: null,
   password2: null,
   nickname: null,
-})
+});
 
-const isSubmitting = ref(false)
+const isSubmitting = ref(false);
 
-const store = useCounterStore()
+const store = useCounterStore();
 
 // 이메일 형식 확인
 const isValidEmail = (email) => {
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return emailPattern.test(email);
-}
+};
 
 // 비밀번호 일치 확인
 const passwordsMatch = (password1, password2) => {
   return password1 === password2;
-}
+};
 
 // 폼 검증 함수
 const validateForm = () => {
   let valid = true;
-  
+
   // 오류 초기화
   errors.value = {
     username: null,
@@ -83,72 +147,72 @@ const validateForm = () => {
     password1: null,
     password2: null,
     nickname: null,
-  }
+  };
 
   // username 검증
   if (!username.value) {
-    errors.value.username = 'username을 입력하세요.';
+    errors.value.username = "username을 입력하세요.";
     valid = false;
   }
 
   // email 검증
   if (!email.value) {
-    errors.value.email = 'email을 입력하세요.';
+    errors.value.email = "email을 입력하세요.";
     valid = false;
   } else if (!isValidEmail(email.value)) {
-    errors.value.email = '잘못된 이메일 형식입니다.';
+    errors.value.email = "잘못된 이메일 형식입니다.";
     valid = false;
   }
 
   // password1 검증
   if (!password1.value) {
-    errors.value.password1 = 'password를 입력하세요.';
+    errors.value.password1 = "password를 입력하세요.";
     valid = false;
   }
 
   // password2 검증
   if (!password2.value) {
-    errors.value.password2 = 'Password confirmation을 입력하세요.';
+    errors.value.password2 = "Password confirmation을 입력하세요.";
     valid = false;
   } else if (!passwordsMatch(password1.value, password2.value)) {
-    errors.value.password2 = '비밀번호가 일치하지 않습니다.';
+    errors.value.password2 = "비밀번호가 일치하지 않습니다.";
     valid = false;
   }
 
   // nickname 검증
   if (!nickname.value) {
-    errors.value.nickname = 'Nickname을 입력하세요.';
+    errors.value.nickname = "Nickname을 입력하세요.";
     valid = false;
   }
 
   return valid;
-}
+};
 
 // 회원가입 함수
 const signUp = async () => {
   if (!validateForm()) {
     return; // 검증 실패 시 회원가입을 진행하지 않음
   }
-  
+
   isSubmitting.value = true;
-  
+
   const payload = {
     username: username.value,
     email: email.value,
     password1: password1.value,
     password2: password2.value,
     nickname: nickname.value,
-  }
-  
+  };
+
   try {
-    await store.signUp(payload)
+    await store.signUp(payload);
     // 회원가입 성공 후 처리 (예: 성공 메시지, 리디렉션 등)
   } catch (error) {
     // 에러 처리 (예: 서버 오류 메시지 등)
   } finally {
     isSubmitting.value = false;
   }
-}
+};
 </script>
 
 <style scoped>
@@ -209,7 +273,7 @@ input {
 }
 
 input[type="submit"] {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   cursor: pointer;
@@ -240,7 +304,11 @@ input[type="submit"]:disabled {
 
 /* 스피너 회전 애니메이션 */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
