@@ -65,6 +65,42 @@
       </p>
       <p class="text-gray-300">공포지수: {{ movie.fear_index }}</p>
     </div>
+    
+    <!-- 감독 정보 -->
+    <h3>감독</h3>
+    <div class="director-section">
+      <div v-for="directorId in movie.movie_director" :key="directorId" class="director-card">
+        <div v-if="directors[directorId]">
+          <img 
+            v-if="directors[directorId].profile_path" 
+            :src="`https://image.tmdb.org/t/p/w200${directors[directorId].profile_path}`" 
+            :alt="directors[directorId].name"
+          >
+          <div class="director-info">
+            <p>{{ directors[directorId].name }}</p>
+            <p>{{ directors[directorId].original_name }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 배우 정보 -->
+    <h3>출연 배우</h3>
+    <div class="actor-section">
+      <div v-for="actorId in movie.movie_actor" :key="actorId" class="actor-card">
+        <div v-if="actors[actorId]">
+        <img
+          v-if="actors[actorId].profile_path" 
+          :src="`https://image.tmdb.org/t/p/w200${actors[actorId].profile_path}`" 
+          :alt="actors[actorId].name"
+        >
+        <div class="actor-info">
+          <p>{{ actors[actorId].name }}</p>
+          <p>{{ actors[actorId].original_name }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
     <YoutubeTrailerModal
       v-if="isModalVisible"
