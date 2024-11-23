@@ -9,6 +9,10 @@ export const useCounterStore = defineStore('counter', () => {
   const articles = ref([])
   const movies = ref([])
   const movieDetail = ref([])
+  const popularMovies = ref([])
+  const latestMovies = ref([])
+  const ratingMovies = ref([])
+  const fearMovies = ref([])
   const reviews = ref([])
   const comments = ref([])
   const API_URL = 'http://127.0.0.1:8000'
@@ -112,6 +116,39 @@ export const useCounterStore = defineStore('counter', () => {
     })
   }
 
+  const getMovieList = async (sortBy) => {
+    const response = await axios.get(`${API_URL}/api/v1/movielist/`, {
+      params: { sort: sortBy },
+      headers: {
+        Authorization: `Token ${token.value}`,
+      },
+      
+    })
+    switch(sortBy) {
+      case 'popularity':
+        popularMovies.value = response.data;
+        break;
+      case 'latest':
+        latestMovies.value = response.data;
+        break;
+      case 'rating':
+        ratingMovies.value = response.data;
+        break;
+      case 'fear':
+        fearMovies.value = response.data;
+        break;
+    }
+  }
+
+  // 랜덤 영화
+  const getRandomMovies = async () => {
+    const response = await axios.get(`${API_URL}/api/v1/random/`, {
+      headers: {
+        Authorization: `Token ${token.value}`
+      }
+    })
+    return response.data
+  }
 
   // 회원가입 요청 액션
   const signUp = function (payload) {
@@ -195,5 +232,5 @@ export const useCounterStore = defineStore('counter', () => {
     return movie
   }
 
-  return { articles, API_URL, reviews, comments, getReviewComments, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById, getMovieDetail, movieDetail  }
+  return { articles, API_URL, reviews, comments, popularMovies, latestMovies, ratingMovies, fearMovies, getRandomMovies, getMovieList, getReviewComments, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById, getMovieDetail, movieDetail  }
 }, { persist: true })

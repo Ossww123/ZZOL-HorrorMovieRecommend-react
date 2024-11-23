@@ -12,13 +12,11 @@
     <h3>줄거리</h3>
     <p>{{ movie.overview }}</p>
     <h3>공식 예고편</h3>
-    <p>{{ movie.overview }}</p>
+    <button @click="openTrailerModal">예고편 보기</button>
     <h3>키워드</h3>
     <p v-for="keyword in keywords.keywords">{{ keyword.name }}</p>
-    <button @click="openTrailerModal">예고편 보기</button>
     <p>{{ movie.user_vote_sum }}  ({{ movie.user_vote_cnt }})</p>
     <p>{{ movie.fear_index }}</p>
-    <p>{{ movie }}</p>
     <YoutubeTrailerModal
       v-if="isModalVisible"
       :showModal="isModalVisible"
@@ -131,7 +129,7 @@ onMounted(async() => {
   
   // const movie = store.movies.find((movie)) movie.id == movieId)
   
-  await getKeyword(movieId);
+  await getKeyword(movie.value.tmdb_Id);
   // keywords.value = movieKeywords; // 영화의 러닝타임을 상태에 저장
   
   // movies가 비어있지 않으면 로딩 상태 false로 설정

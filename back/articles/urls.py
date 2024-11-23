@@ -11,6 +11,8 @@ urlpatterns = [
     path('movies/', views.save_movies_to_db),
     # 추천
     path('recommend/', views.recommend_movies, name='recommend_movies'),
+    path('movielist/', views.movie_list),
+    path('random/', views.random_movie),
     # 리뷰 경로
     path('<int:movie_pk>/reviews/', views.review),
     path('<int:movie_pk>/reviews/<int:review_pk>/', views.review_update),

@@ -11,6 +11,7 @@ import MovieListView from '@/views/MovieListView.vue'
 import ReviewSearchView from '@/views/ReviewSearchView.vue'
 import RecommendedView from '@/views/RecommendedView.vue'
 import HomeView from '@/views/HomeView.vue'
+import RandomTestView from '@/views/RandomTestView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -61,6 +62,10 @@ const router = createRouter({
     {
       path: '/recommended',
       component: RecommendedView
+    },
+    {
+      path: '/random',
+      component: RandomTestView
     },
   ]
 })

@@ -7,19 +7,42 @@
       :movie="movie"
       class="movie-card"
     />
+    <div v-for="(movies, category) in randomMovies" :key="category" class="category">
+      <h2>{{ category }}</h2>
+      <div class="movie-grid">
+        <div v-for="movie in movies" :key="movie.id" class="movie-card">
+          <img 
+            :src="`https://image.tmdb.org/t/p/w300${movie.poster_path}`" 
+            :alt="movie.title"
+          >
+          <h3>{{ movie.title }}</h3>
+          <p>평점: {{ movie.vote_average }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
   import { useCounterStore } from '@/stores/counter'
-  import { onMounted } from 'vue'
+  import { ref, onMounted } from 'vue'
   import MovieCard from '@/components/MovieCard.vue';
 
   const store = useCounterStore();
+  const randomMovies = ref({})
 
   onMounted(() => {
     store.getMovies();
-    console.log(store.movies);
+    store.getMovieList('popularity')
+    store.getMovieList('latest')
+    store.getMovieList('rating')
+    store.getMovieList('fear')
+    console.log(store.popularMovies)
+    console.log(store.latestMovies)
+    console.log(store.ratingMovies)
+    console.log(store.fearMovies)
+    // console.log(store.movies);
+    randomMovies.value = store.getRandomMovies()
     console.log('여기는 됬냐?');
   });
 </script>
