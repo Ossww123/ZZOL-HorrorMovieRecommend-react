@@ -1,24 +1,38 @@
+<!-- App.vue -->
 <template>
-  <div class="app-container">
+  <div class="min-h-screen flex flex-col bg-black">
     <AppNavbar />
-    <div :class="['router-container', routeName === 'SignUpView' || routeName === 'LogInView' ? 'centered' : '']">
+    <main :class="mainClass">
       <RouterView />
-    </div>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router'
-import AppNavbar from '@/components/Common/AppNavbar.vue'
+import { useRoute } from "vue-router";
+import AppNavbar from "@/components/Common/AppNavbar.vue";
+import { watchEffect, ref, computed } from "vue";
 
 // 현재 라우트의 이름을 가져옵니다.
-const route = useRoute()
-const routeName = route.name // 현재 경로 이름
+const route = useRoute();
+const routeName = ref(""); // 현재 경로 이름
+
+// watchEffect로 라우트 이름이 바뀔 때마다 업데이트
+watchEffect(() => {
+  routeName.value = route.name; // 라우트의 이름을 가져옵니다.
+});
+
+const mainClass = computed(() => {
+  return routeName.value === "SignUpView" || routeName.value === "LogInView"
+    ? "flex justify-center items-center"
+    : "";
+});
 </script>
 
 <style>
 /* 전역 스타일을 위해 scoped 제거 */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;

@@ -1,64 +1,66 @@
-<!--front/src/vomponents/MovieRecommend.vue-->
 <template>
-  <div class="movie-recommend">
-    <h1>영화 추천 서비스</h1>
-    
-    <form @submit.prevent="handleRecommend">
-      <label for="userInput">원하는 영화 설명:</label>
-      <textarea 
-        id="userInput" 
-        v-model="userInput" 
-        placeholder="영화에 대한 설명을 입력하세요..." 
+  <div class="movie-recommend container mx-auto p-6 bg-gray-900 text-white">
+    <h1 class="text-3xl font-bold text-red-600 mb-6">영화 추천 서비스</h1>
+
+    <form
+      @submit.prevent="handleRecommend"
+      class="bg-gray-800 p-6 rounded-lg shadow-lg"
+    >
+      <label
+        for="userInput"
+        class="block text-lg font-semibold text-gray-300 mb-2"
+        >원하는 영화 설명:</label
+      >
+      <textarea
+        id="userInput"
+        v-model="userInput"
+        placeholder="영화에 대한 설명을 입력하세요..."
         rows="4"
-        required>
-      </textarea>
-      <button :disabled="loading" type="submit">
+        required
+        class="w-full p-4 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 mb-4"
+      ></textarea>
+      <button
+        :disabled="loading"
+        type="submit"
+        class="w-full py-3 bg-red-600 text-white text-lg rounded-lg hover:bg-red-700 disabled:bg-gray-600 transition duration-300"
+      >
         {{ loading ? "추천 중..." : "추천 받기" }}
       </button>
     </form>
 
-    <div v-if="error" class="error">
+    <div v-if="error" class="mt-4 text-red-500">
       {{ error }}
     </div>
 
-    <div v-if="movies.length > 0" class="movie-list">
-      <h2>추천 영화 목록:</h2>
-      <ul>
-        <li v-for="(movie, index) in movies" :key="movie.id">
-          <strong>{{ index + 1 }}. {{ movie.title }}</strong>
-          <p>출시일: {{ movie.release_date || "N/A" }}</p>
-          <p>인기도: {{ movie.popularity }}</p>
-          <img :src="'https://image.tmdb.org/t/p/w500' + movie.poster_path" alt="" class="movie-image">
-        </li>
-      </ul>
-    </div>
+    <Canvas v-if="movies.length > 0" :movies="movies" class="mt-6" />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
+import Canvas from "./Canvas.vue";
 
-// Vue 상태 관리
 const userInput = ref("");
 const movies = ref([]);
 const loading = ref(false);
 const error = ref("");
 
-// 추천 처리 함수
 async function handleRecommend() {
   loading.value = true;
   error.value = "";
   movies.value = [];
 
   try {
-    // Django 백엔드에 영화 추천 요청
-    const response = await axios.post("http://localhost:8000/api/v1/recommend/", { user_input: userInput.value });
-    // 백엔드에서 받은 영화 리스트를 Vue 상태에 저장
+    const response = await axios.post(
+      "http://localhost:8000/api/v1/recommend/",
+      { user_input: userInput.value }
+    );
     movies.value = response.data.movies;
   } catch (err) {
-    // 오류 처리
-    error.value = err.response?.data?.error || "영화 추천 중 오류가 발생했습니다.";
+    error.value =
+      err.response?.data?.error || "영화 추천 중 오류가 발생했습니다.";
+    console.error("추천 오류:", err);
   } finally {
     loading.value = false;
   }
@@ -67,31 +69,40 @@ async function handleRecommend() {
 
 <style scoped>
 .movie-recommend {
-  font-family: Arial, sans-serif;
-  padding: 20px;
+  font-family: "Roboto", sans-serif;
 }
 
 form {
-  margin-bottom: 20px;
+  background-color: #1a202c;
+  padding: 20px;
+  border-radius: 8px;
 }
 
 textarea {
-  width: 100%;
+  background-color: #2d3748;
+  color: white;
+  border: 1px solid #4a5568;
+  border-radius: 8px;
   padding: 10px;
-  margin-bottom: 10px;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+textarea:focus {
+  background-color: #4a5568;
 }
 
 button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  background-color: #f56565;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #e53e3e;
 }
 
 button:disabled {
-  background-color: #999;
+  background-color: #a0aec0;
 }
 
 .error {
