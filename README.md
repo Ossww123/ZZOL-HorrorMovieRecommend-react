@@ -57,6 +57,27 @@ model 설정 중 중단
 
 
 ---
+
+
+
+2024.11.23 21:35
+
+만진거
+App.vue
+LogInView.vue
+SignUpView.vue
+MovieRecommend.vue
+MovieDetailInfo.vue
+ReviewSearchView.vue
+ArticleView.vue
+ArticleList.vue
+ArticleListItem.vue
+
+Canvas.vue 추가
+
+공포 테마의 CSS 추가
+추천 알고리즘에 이미지 돌아가게 하는거에 시간 갈아넣음
+=======
 2024.11.23 17:18
 
 back
@@ -74,3 +95,4 @@ vue.index랑 vue.views에 확인용 random 관련 명령어 추가
 db 받을 당시 상위 몇멍을 제한을 걸어
 감독은 1명, 배우는 5명 출력 가능함 
 추가적으로 출력하고 싶다면 back.views.py 에서 수정해야함
+
