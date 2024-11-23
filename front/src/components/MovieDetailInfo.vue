@@ -141,10 +141,12 @@ const movieId = route.params.movie_id;
 const apiKey = import.meta.env.VITE_TMDB;
 const movie = ref(null);
 
-const isLoading = ref(true);
-const isModalVisible = ref(false); // 모달의 열림 상태
-const runtime = ref([]);
-const keywords = ref([]);
+const isLoading = ref(true)
+const isModalVisible = ref(false) // 모달의 열림 상태
+const runtime = ref([])
+const keywords = ref([])
+const directors = ref({})
+const actors = ref({})
 
 import axios from "axios";
 
@@ -176,6 +178,26 @@ const getKeyword = async (movieId) => {
   keywords.value = response.data;
   console.log(keywords.value);
 };
+
+const getDirector = async (directorId) => {
+    const response = await axios.get(`${store.API_URL}/api/v1/directors/${directorId}/`, {
+      headers: {
+        Authorization: `Token ${store.token}`
+      }
+    })
+    directors.value[directorId] = response.data
+}
+
+const getActor = async (actorIds) => {
+  for (const actorId of actorIds) {
+    const response = await axios.get(`${store.API_URL}/api/v1/actors/${actorId}/`, {
+      headers: {
+        Authorization: `Token ${store.token}`
+      }
+    })
+    actors.value[actorId] = response.data
+  }
+}
 
 const genreList = [
   { id: 28, name: "액션" },
@@ -214,9 +236,16 @@ onMounted(async () => {
   await getMovieRuntime(movie.value.tmdb_Id);
 
   // const movie = store.movies.find((movie)) movie.id == movieId)
-
-  await getKeyword(movieId);
+  
+  await getKeyword(movie.value.tmdb_Id);
   // keywords.value = movieKeywords; // 영화의 러닝타임을 상태에 저장
+  
+  getDirector(movie.value.movie_director)
+  console.log('감독')
+  console.log(movie.value.movie_director)
+  getActor(movie.value.movie_actor)
+  console.log('배우')
+  console.log(movie.value.movie_actor)
 
   // movies가 비어있지 않으면 로딩 상태 false로 설정
   const interval = setInterval(() => {
@@ -233,16 +262,6 @@ const updateMovieData = async () => {
   store.getMovieDetail(movieId);
 };
 
-// const getGenres = (genreIds) => {
-//   // genreIds 배열을 장르 이름으로 변환
-//   const genres = genreIds.map(id => {
-//     const genre = genreList.find(g => g.id === id);
-//     return genre ? genre.name : null;
-//   });
-
-//   // 배열의 장르 이름들을 ' / '로 연결
-//   return genres.filter(Boolean).join(' / ');
-// }
 
 // 예고편 모달 열기
 const openTrailerModal = () => {
@@ -254,3 +273,54 @@ const closeTrailerModal = () => {
   isModalVisible.value = false;
 };
 </script>
+
+<style scoped>
+.director-section,
+.actor-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.director-card,
+.actor-card {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.director-card:hover,
+.actor-card:hover {
+  transform: translateY(-5px);
+}
+
+.director-card img,
+.actor-card img {
+  width: 100%;
+  height: 225px;
+  object-fit: cover;
+}
+
+.director-info,
+.actor-info {
+  padding: 10px;
+  text-align: center;
+}
+
+.director-info p,
+.actor-info p {
+  margin: 5px 0;
+}
+
+/* 이미지가 없는 경우 대체 스타일 */
+.director-card:not(:has(img)),
+.actor-card:not(:has(img)) {
+  background: #333;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

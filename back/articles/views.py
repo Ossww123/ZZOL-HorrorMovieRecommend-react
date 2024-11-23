@@ -1,5 +1,5 @@
 # back/articles/views.py
-
+import random
 import json
 import requests
 from pprint import pprint as pp
@@ -11,7 +11,6 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
 from openai import OpenAI
 from .models import Article, Movie, Director, Actor, Comment, Review
 from .serializers import ArticleListSerializer, ArticleSerializer, CommentListSerializer, MovieListSerializer, MovieSerializer, ReviewSerializer, CommentSerializer
@@ -387,3 +386,72 @@ def comment_update(request, review_pk, comment_pk):
     elif request.method == 'DELETE':
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET'])
+# 항목에 따른 정렬 함수
+def movie_list(request):
+    sort_by = request.query_params.get('sort', 'popularity')
+    if sort_by == 'popularity':
+        movies = Movie.objects.all().order_by('-popularity')[:5]
+    elif sort_by == 'latest':
+        movies = Movie.objects.all().order_by('-release_date')[:5]
+    elif sort_by == 'rating':
+        movies = Movie.objects.all().order_by('-tmdb_vote_sum')[:5]
+    elif sort_by == 'fear':
+        movies = Movie.objects.all().order_by('-fear_index')[:5]
+    
+    serializer = MovieListSerializer(movies, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def random_movie(request):
+    horror_keywords = {
+        'possession': {'id': 178646, 'name': '악령 포제션'},
+        'serial killer': {'id': 9663, 'name': '연쇄 살인'},
+        'supernatural': {'id': 6152, 'name': '초자연현상'},
+        'monster': {'id': 1299, 'name': '괴물/크리처'},
+        'isolation': {'id': 1533, 'name': '고립된 공간'},
+        'zombie': {'id': 12377, 'name': '좀비'},
+        'dark secret': {'id': 10349, 'name': '가족의 비밀'},
+        'ritual': {'id': 4720, 'name': '의식/제의'},
+        'survival': {'id': 10349, 'name': '생존 공포'},
+        'psychological horror': {'id': 295907, 'name': '정신적 공포'}
+    }
+    
+    selected_keywords = random.sample(list(horror_keywords.keys()), 2)
+    results = {}
+    
+    for keyword in selected_keywords:
+        params = {
+            'api_key': settings.TMDB_API_KEY,
+            'with_keywords': horror_keywords[keyword]['id'],
+            'sort_by': 'popularity.desc',
+            'with_genres': 27,
+            'language': 'ko-KR'
+        }
+        
+        response = requests.get('https://api.themoviedb.org/3/discover/movie', params=params)
+        movies = response.json()['results'][:8]
+        results[horror_keywords[keyword]['name']] = movies
+    return Response(results)
+
+
+@api_view(['GET'])
+def director_info(request, director_pk):
+    director = get_object_or_404(Director, pk=director_pk)
+    return Response({
+        'name': director.name,
+        'original_name': director.original_name,
+        'profile_path': director.profile_path
+    })
+
+@api_view(['GET'])
+def actor_info(request, actor_pk):
+    actor = get_object_or_404(Actor, pk=actor_pk)
+    return Response({
+        'name': actor.name,
+        'original_name': actor.original_name,
+        'profile_path': actor.profile_path
+    })

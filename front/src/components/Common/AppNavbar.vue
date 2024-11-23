@@ -13,6 +13,7 @@
       <RouterLink to="/movies" class="hover:text-gray-400">Movies</RouterLink>
       <RouterLink to="/review-search" class="hover:text-gray-400">리뷰 검색</RouterLink>
       <RouterLink to="/recommended" class="hover:text-gray-400">영화 추천</RouterLink>
+      <RouterLink to="/random" class="hover:text-gray-400">랜덤</RouterLink>
     </div>
 
     <!-- 로그인, 회원가입을 오른쪽으로 이동 -->
