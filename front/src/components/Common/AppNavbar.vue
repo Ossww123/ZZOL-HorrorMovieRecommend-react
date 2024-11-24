@@ -50,8 +50,9 @@
         >회원가입</RouterLink
       >
 
-      <!-- 로그인 상태에서 로그아웃 버튼 왼쪽에 검색 창 위치 -->
-      <div v-if="isLoggedIn" class="flex items-center">
+      <!-- 로그인 상태에서 -->
+      <div v-if="isLoggedIn" class="flex items-center space-x-4">
+        <!-- 검색 창 -->
         <input
           type="text"
           v-model="searchQuery"
@@ -59,16 +60,25 @@
           placeholder="영화 제목 검색"
           class="px-4 py-2 rounded bg-gray-800 text-white focus:outline-none"
         />
-      </div>
 
-      <!-- 로그아웃 버튼 -->
-      <form v-if="isLoggedIn" @submit.prevent="logOut">
-        <input
-          type="submit"
-          value="Logout"
-          class="hover:text-gray-400 py-2 px-4 rounded border border-transparent bg-transparent text-white cursor-pointer"
-        />
-      </form>
+        <!-- 로그아웃 버튼 -->
+        <form @submit.prevent="logOut">
+          <input
+            type="submit"
+            value="Logout"
+            class="hover:text-gray-400 py-2 px-4 rounded border border-transparent bg-transparent text-white cursor-pointer"
+          />
+        </form>
+
+        <!-- 프로필 정보 링크 -->
+        <RouterLink to="/profile" class="hover:text-gray-400">
+          <img
+            :src="userProfileImage"
+            alt="Profile"
+            class="w-8 h-8 rounded-full border-2 border-white"
+          />
+        </RouterLink>
+      </div>
     </div>
   </nav>
 </template>
@@ -104,4 +114,18 @@ const logOut = function () {
 
 // 로그인 여부를 computed로 처리
 const isLoggedIn = computed(() => store.isLogin);
+
+import defaultProfileImage from "@/assets/default-profile.png";
+
+// 프로필 이미지 경로를 조건에 따라 선택
+const userProfileImage = computed(() => {
+  console.log("Profile Image URL:ㄴㄴㄴㄴ", store.profileImage);
+  console.log("한번더", store.profileImage);
+  // profileImage가 유효하면 그대로 사용
+  if (store.profileImage) {
+    console.log("여기 안 왔어?");
+    return store.profileImage; // 절대 URL이므로 그대로 반환
+  }
+  return defaultProfileImage; // 기본 이미지 반환
+});
 </script>
