@@ -7,7 +7,8 @@
     <p>fear_score: {{ review.fear_score }}</p>
     <p>content: {{ review.content }}</p>
     <button @click="deleteReview(movie_pk, review.id)">삭제</button>
-    <ReviewCommentsList 
+    <ReviewCommentsList
+    :key="`comments-${review.id}-${Date.now()}`" 
     :review_pk="review.id"
     :movie_pk="movie_pk"
     />
@@ -22,30 +23,26 @@ import ReviewCommentsList from './ReviewCommentsList.vue';
 
 
 const store = useCounterStore();
+const emit = defineEmits(['reviewDeleted'])
 
 defineProps({
   review: Object,  // 부모 컴포넌트에서 article을 props로 받음
   movie_pk: String
 })
 
-const deleteReview = function (movie_pk, reviewId) {
-  axios({
+const deleteReview = async function (movie_pk, reviewId) {
+  await axios({
         method: 'delete'  ,
         url: `${store.API_URL}/api/v1/${movie_pk}/reviews/${reviewId}/` , 
         headers: {
           Authorization: `Token ${store.token}`
         }
       })
-      .then((res) => {
+
         console.log("제발 됬다고 말해222222")
-        store.getMovieReviews(movie_pk)
-        store.getMovies()
-      })
-      .catch((err) => {
-        console.log("응 안돼 돌아가22222")
-        console.log(movie_pk, reviewId)
-        console.log(err)
-      })
-    }
+        await store.getMovieReviews(movie_pk)
+        emit('reviewDeleted')
+        window.alert('성공')
+      }
 
 </script>

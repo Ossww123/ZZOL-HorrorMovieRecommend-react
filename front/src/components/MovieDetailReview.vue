@@ -41,18 +41,23 @@
     </form>
     <hr>
   </div>
+   <div v-if="store.reviews.length === 0">
+      작성된 리뷰가 없습니다.
+    </div>
   <MovieDetailReviewItem
-      v-for="review in store.reviews"
-      :key="review.id"
-      :review="review"
-      :movie_pk="movie_pk"
-    />
+  v-else
+  v-for="review in store.reviews"
+  :key="`review-${review.id}-${Date.now()}`"
+  :review="review"
+  :movie_pk="movie_pk"
+  @reviewDeleted="onReviewDeleted"
+/>
   </div>
 </template>
 
 <script setup>
   import MovieDetailReviewItem from '@/components/MovieDetailReviewItem.vue'
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   import { useCounterStore } from '@/stores/counter'
   import axios from 'axios'
   import { useRouter } from 'vue-router'
@@ -64,6 +69,9 @@
   const fear_score = ref(null)
   const router = useRouter()
 
+  const reviews = computed(() => store.reviews || [])
+
+
   const emit = defineEmits(['reviewCreated'])
 
   defineProps({
@@ -72,34 +80,37 @@
 
   
 
-  const createReview = function (movie_pk) {
-      axios({
-        method: 'post'  ,
-        url: `${store.API_URL}/api/v1/${movie_pk}/reviews/` , 
-        data: {
-          rate: rate.value,
-          fear_score: fear_score.value,
-          content: content.value,
-        },
-        headers: {
-          Authorization: `Token ${store.token}`
-        }
-      })
-      .then(async (res) => {
-        console.log("제발 됬다고 말해")
-        window.alert('성공!')
-        content.value = ''
-        rate.value = null
-        fear_score.value = null
-        emit('reviewCreated')
-      })
-      .catch((err) => {
-        if (err.response.data.error) {
-      alert(err.response.data.error)
-    }
-      })
-    }
+  const createReview = async function (movie_pk) {
+    await axios({
+      method: 'post',
+      url: `${store.API_URL}/api/v1/${movie_pk}/reviews/`,
+      data: {
+        rate: rate.value,
+        fear_score: fear_score.value,
+        content: content.value,
+      },
+      headers: {
+        Authorization: `Token ${store.token}`
+      }
+    })
+    // 입력 폼 초기화
+    content.value = ''
+    rate.value = null
+    fear_score.value = null
+    
+    // 리뷰 목록과 영화 정보 갱신
+    await store.getMovieReviews(movie_pk)
+    await store.getMovieDetail(movie_pk)
+    window.alert('성공')
+    emit('reviewChange')
+  
+}
 
+  const onReviewDeleted = async () => {
+    await store.getMovieReviews(movie_pk)
+    await store.getMovieDetail(movie_pk)
+    emit('reviewChange')
+  }
 </script>
 
 <style scoped>

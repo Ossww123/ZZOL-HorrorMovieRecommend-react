@@ -9,9 +9,11 @@ export const useCounterStore = defineStore('counter', () => {
   const articles = ref([])
   const movies = ref([])
   const movieDetail = ref([])
+  const randomDetail = ref([])
   const popularMovies = ref([])
   const latestMovies = ref([])
   const ratingMovies = ref([])
+  const randomReviews = ref([])
   const fearMovies = ref([])
   const reviews = ref([])
   const comments = ref([])
@@ -45,8 +47,23 @@ export const useCounterStore = defineStore('counter', () => {
   }
 
   // 영화 리뷰 가져와서 reviews에 저장하는 함수
-  const getMovieReviews = function (movie_pk) {
-    axios.get(`${API_URL}/api/v1/${movie_pk}/reviews/`, {
+  const getMovieReviews = async function (movie_pk) {
+    try {
+      const response = await axios.get(`${API_URL}/api/v1/${movie_pk}/reviews/`, {
+        headers: {
+          Authorization: `Token ${token.value}`
+        }
+      })
+      reviews.value = response.data
+      return response.data
+    } catch (err) {
+      console.error("리뷰 가져오기 실패:", err)
+      throw err
+    }
+  }
+
+  const getRandomMovieReviews = function (tmdb_id) {
+    axios.get(`${API_URL}/api/v1/random/${tmdb_id}/reviews/`, {
       headers: {
         Authorization: `Token ${token.value}`
       }
@@ -54,8 +71,8 @@ export const useCounterStore = defineStore('counter', () => {
     .then((res) => {
       console.log("이까지오나")
       console.log(res.data)
-      reviews.value = res.data
-      console.log(reviews.value)
+      randomReviews.value = res.data
+      console.log(randomReviews.value)
     })
     .catch((err) => {
       console.log("아님여긴가")
@@ -150,6 +167,24 @@ export const useCounterStore = defineStore('counter', () => {
     return response.data
   }
 
+  const getRandomDetail = async (movieId) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/v1/random/${movieId}/`,
+        {
+          headers: {
+            Authorization: `Token ${token.value}`
+          }
+        }
+      )
+      randomDetail.value = response.data
+      return response.data
+    } catch (error) {
+      console.error('Error fetching movie:', error)
+      throw error
+    }
+  }
+
   // 회원가입 요청 액션
   const signUp = function (payload) {
     // const username = payload.username
@@ -232,5 +267,5 @@ export const useCounterStore = defineStore('counter', () => {
     return movie
   }
 
-  return { articles, API_URL, reviews, comments, popularMovies, latestMovies, ratingMovies, fearMovies, getRandomMovies, getMovieList, getReviewComments, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById, getMovieDetail, movieDetail  }
+  return { articles, API_URL, reviews, comments, popularMovies, latestMovies, ratingMovies, fearMovies, randomDetail, randomReviews, getRandomMovieReviews, getRandomDetail, getRandomMovies, getMovieList, getReviewComments, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById, getMovieDetail, movieDetail  }
 }, { persist: true })
