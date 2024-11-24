@@ -23,8 +23,20 @@
       <RouterLink to="/random" class="hover:text-gray-400">랜덤</RouterLink>
     </div>
 
-    <!-- 로그인, 회원가입을 오른쪽으로 이동 -->
-    <div class="ml-auto flex space-x-4">
+    <!-- 로그인 상태에 따라 검색 창 위치 조정 -->
+    <div class="ml-auto flex items-center space-x-4">
+      <!-- 로그인하지 않았을 때 검색 창을 로그인 버튼 왼쪽에 위치 -->
+      <div v-if="!isLoggedIn" class="flex items-center">
+        <input
+          type="text"
+          v-model="searchQuery"
+          @input="onSearch"
+          placeholder="영화 제목 검색"
+          class="px-4 py-2 rounded bg-gray-800 text-white focus:outline-none"
+        />
+      </div>
+
+      <!-- 로그인, 회원가입 버튼들 -->
       <RouterLink
         v-if="!isLoggedIn"
         :to="{ name: 'LogInView' }"
@@ -37,14 +49,24 @@
         class="hover:text-gray-400"
         >회원가입</RouterLink
       >
-    </div>
 
-    <div v-if="isLoggedIn" class="mt-4">
-      <form @submit.prevent="logOut">
+      <!-- 로그인 상태에서 로그아웃 버튼 왼쪽에 검색 창 위치 -->
+      <div v-if="isLoggedIn" class="flex items-center">
+        <input
+          type="text"
+          v-model="searchQuery"
+          @input="onSearch"
+          placeholder="영화 제목 검색"
+          class="px-4 py-2 rounded bg-gray-800 text-white focus:outline-none"
+        />
+      </div>
+
+      <!-- 로그아웃 버튼 -->
+      <form v-if="isLoggedIn" @submit.prevent="logOut">
         <input
           type="submit"
           value="Logout"
-          class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 cursor-pointer"
+          class="hover:text-gray-400 py-2 px-4 rounded border border-transparent bg-transparent text-white cursor-pointer"
         />
       </form>
     </div>
@@ -52,15 +74,34 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useCounterStore } from "@/stores/counter";
-import { RouterLink } from "vue-router";
+import { useRouter } from "vue-router"; // useRouter를 가져옴
+import { debounce } from "lodash";
 
+// 스토어와 라우터 훅을 설정
 const store = useCounterStore();
+const router = useRouter(); // useRouter 훅으로 라우터 객체를 가져옴
 
+const searchQuery = ref(""); // 검색어 상태 변수
+
+// 검색 함수 (디바운스 적용)
+const onSearch = debounce(() => {
+  console.log("검색어:", searchQuery.value);
+  // searchQuery가 있을 때 MovieListView로 쿼리 파라미터로 검색어를 넘기기
+  if (searchQuery.value) {
+    router.push({
+      name: "MovieListView",
+      query: { search: searchQuery.value },
+    });
+  }
+}, 500);
+
+// 로그아웃 함수
 const logOut = function () {
   store.logOut();
 };
 
+// 로그인 여부를 computed로 처리
 const isLoggedIn = computed(() => store.isLogin);
 </script>

@@ -1,74 +1,75 @@
 // router/index.js
-import { createRouter, createWebHistory } from 'vue-router'
-import ArticleView from '@/views/ArticleView.vue'
-import DetailView from '@/views/DetailView.vue'
-import CreateView from '@/views/CreateView.vue'
-import SignUpView from '@/views/SignUpView.vue'
-import LogInView from '@/views/LogInView.vue'
-import { useCounterStore } from '@/stores/counter'
-import MovieDetailView from '@/views/MovieDetailView.vue'
-import MovieListView from '@/views/MovieListView.vue'
-import ReviewSearchView from '@/views/ReviewSearchView.vue'
-import RecommendedView from '@/views/RecommendedView.vue'
-import HomeView from '@/views/HomeView.vue'
-import RandomTestView from '@/views/RandomTestView.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import ArticleView from "@/views/ArticleView.vue";
+import DetailView from "@/views/DetailView.vue";
+import CreateView from "@/views/CreateView.vue";
+import SignUpView from "@/views/SignUpView.vue";
+import LogInView from "@/views/LogInView.vue";
+import { useCounterStore } from "@/stores/counter";
+import MovieDetailView from "@/views/MovieDetailView.vue";
+import MovieListView from "@/views/MovieListView.vue";
+import ReviewSearchView from "@/views/ReviewSearchView.vue";
+import RecommendedView from "@/views/RecommendedView.vue";
+import HomeView from "@/views/HomeView.vue";
+import RandomTestView from "@/views/RandomTestView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'HomeView',
-      component: HomeView
+      path: "/",
+      name: "HomeView",
+      component: HomeView,
     },
     {
-      path: '/articles',
-      name: 'ArticleView',
-      component: ArticleView
+      path: "/articles",
+      name: "ArticleView",
+      component: ArticleView,
     },
     {
-      path: '/articles/:id',
-      name: 'DetailView',
-      component: DetailView
+      path: "/articles/:id",
+      name: "DetailView",
+      component: DetailView,
     },
     {
-      path: '/create',
-      name: 'CreateView',
-      component: CreateView
+      path: "/create",
+      name: "CreateView",
+      component: CreateView,
     },
     {
-      path: '/signup',
-      name: 'SignUpView',
-      component: SignUpView
+      path: "/signup",
+      name: "SignUpView",
+      component: SignUpView,
     },
     {
-      path: '/login',
-      name: 'LogInView',
-      component: LogInView
+      path: "/login",
+      name: "LogInView",
+      component: LogInView,
     },
     {
-      path: '/movies',
-      component: MovieListView
+      path: "/movies",
+      name: "MovieListView",
+      component: MovieListView,
     },
     {
-      path: '/:movie_id',
-      name: 'MovieDetailView',
-      component: MovieDetailView
+      path: "/:movie_id",
+      name: "MovieDetailView",
+      component: MovieDetailView,
     },
     {
-      path: '/review-search',
-      component: ReviewSearchView
+      path: "/review-search",
+      component: ReviewSearchView,
     },
     {
-      path: '/recommended',
-      component: RecommendedView
+      path: "/recommended",
+      component: RecommendedView,
     },
     {
-      path: '/random',
-      component: RandomTestView
+      path: "/random",
+      component: RandomTestView,
     },
-  ]
-})
+  ],
+});
 
 // 로그인 관련 페이지 막기 일단 주석 처리하기
 
@@ -90,4 +91,4 @@ router.beforeEach((to, from) => {
   }
 })
 */
-export default router
+export default router;

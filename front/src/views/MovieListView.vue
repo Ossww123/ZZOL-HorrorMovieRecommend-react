@@ -1,6 +1,11 @@
 <template>
   <h1>전체 영화 목록 페이지</h1>
 
+  <!-- 검색 결과가 없을 때 표시할 메시지 -->
+  <div v-if="paginatedMovies.length === 0 && !isLoading" class="text-center">
+    <p>일치하는 제목이 없습니다.</p>
+  </div>
+
   <!-- 영화 목록 필터링 -->
   <div class="movie-list">
     <MovieCard
@@ -11,8 +16,14 @@
     />
   </div>
 
+  <!-- 로딩 중 표시 -->
+  <div v-if="isLoading" class="text-center">로딩 중...</div>
+
+  <!-- 에러 메시지 표시 -->
+  <div v-if="error" class="text-center text-red-500">{{ error }}</div>
+
   <div class="pagination">
-    <!-- 첫 페이지로 이동 버튼 -->
+    <!-- 페이지 네비게이션 버튼들 -->
     <button
       @click="changePage(1)"
       :disabled="currentPage <= 1"
@@ -20,8 +31,6 @@
     >
       처음
     </button>
-
-    <!-- 이전 페이지로 이동 버튼 -->
     <button
       @click="changePage(currentPage - 1)"
       :disabled="currentPage <= 1"
@@ -29,10 +38,7 @@
     >
       이전
     </button>
-
     <span>Page {{ currentPage }} of {{ totalPages }}</span>
-
-    <!-- 다음 페이지로 이동 버튼 -->
     <button
       @click="changePage(currentPage + 1)"
       :disabled="currentPage >= totalPages"
@@ -40,8 +46,6 @@
     >
       다음
     </button>
-
-    <!-- 마지막 페이지로 이동 버튼 -->
     <button
       @click="changePage(totalPages)"
       :disabled="currentPage >= totalPages"
@@ -54,26 +58,50 @@
 
 <script setup>
 import { useCounterStore } from "@/stores/counter";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
+import { useRoute } from "vue-router"; // 검색 쿼리 처리용
 import MovieCard from "@/components/MovieCard.vue";
 
 const store = useCounterStore();
+const route = useRoute();
+
 const currentPage = ref(1); // 현재 페이지 상태 변수
 const moviesPerPage = 20; // 한 페이지에 표시할 영화 수
+const searchQuery = ref(route.query.search || ""); // 검색어 상태 변수
+const isLoading = ref(false); // 로딩 상태
+const error = ref(null); // 에러 메시지
 
-// 전체 영화 목록
+// 전체 영화 목록 (스토어에서 가져오기)
 const totalMovies = computed(() => store.movies);
 
-// 전체 페이지 수 계산 (전체 영화 목록 기준)
+// 검색어에 따라 필터링된 영화 목록
+const filteredMovies = computed(() => {
+  if (!searchQuery.value) {
+    return totalMovies.value; // 검색어가 없으면 전체 목록 반환
+  }
+  return totalMovies.value.filter((movie) => {
+    // 제목 또는 원제에 검색어가 포함되어 있는지 체크
+    return (
+      (movie.title &&
+        movie.title.toLowerCase().includes(searchQuery.value.toLowerCase())) ||
+      (movie.original_title &&
+        movie.original_title
+          .toLowerCase()
+          .includes(searchQuery.value.toLowerCase()))
+    );
+  });
+});
+
+// 전체 페이지 수 계산 (검색어 필터링 후 전체 영화 목록 기준)
 const totalPages = computed(() =>
-  Math.ceil(totalMovies.value.length / moviesPerPage)
+  Math.ceil(filteredMovies.value.length / moviesPerPage)
 );
 
 // 현재 페이지에 해당하는 영화 목록 계산
 const paginatedMovies = computed(() => {
   const startIndex = (currentPage.value - 1) * moviesPerPage;
   const endIndex = startIndex + moviesPerPage;
-  return totalMovies.value.slice(startIndex, endIndex);
+  return filteredMovies.value.slice(startIndex, endIndex);
 });
 
 // 페이지 전환 함수
@@ -83,9 +111,36 @@ const changePage = (page) => {
   }
 };
 
-onMounted(() => {
-  store.getMovies(); // 영화 목록 가져오기
+// 영화 목록 가져오기 (스토어에서 호출)
+const fetchMovies = async () => {
+  isLoading.value = true;
+  error.value = null;
+  try {
+    await store.getMovies(); // 영화 목록 가져오기
+    console.log("Movies loaded:", store.movies); // 데이터 확인
+  } catch (err) {
+    error.value = "영화 목록을 불러오는 중 오류가 발생했습니다.";
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// 페이지가 처음 로드되거나 검색어가 바뀔 때마다 영화 목록을 다시 불러옵니다.
+onMounted(fetchMovies);
+
+// 검색어가 변경될 때마다 fetchMovies를 호출하여 영화 목록을 갱신
+watch(searchQuery, () => {
+  fetchMovies();
 });
+
+// 쿼리 파라미터(search)가 변경될 때마다 searchQuery 값을 갱신
+watch(
+  () => route.query.search,
+  (newSearch) => {
+    searchQuery.value = newSearch || ""; // 쿼리 파라미터에 search가 없다면 기본값으로 빈 문자열
+    fetchMovies(); // 새로운 검색어에 맞는 영화 목록을 가져옴
+  }
+);
 </script>
 
 <style scoped>
