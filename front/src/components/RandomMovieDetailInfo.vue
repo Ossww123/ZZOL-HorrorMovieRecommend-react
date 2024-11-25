@@ -121,7 +121,7 @@
       <p class="text-lg text-gray-400">영화를 찾을 수 없습니다.</p>
     </div>
   
-    <RandomMovieDetailReview :tmdb_id="movieId" @reviewCreated="updateMovieData" />
+    <RandomMovieDetailReview :tmdb_id="movieId" @reviewChange="updateMovieData" />
   </template>
   
   <style scoped>
@@ -294,9 +294,9 @@
   });
   
   const updateMovieData = async () => {
-    store.getMovieReviews(movieId); // 해당 영화의 리뷰 업데이트
-    store.getMovies(); // 전체 영화 정보 업데이트
-    store.getMovieDetail(movieId);
+    await store.getRandomMovieReviews(movieId); // 해당 영화의 리뷰 업데이트
+    await store.getRandomDetail(movieId);
+    movie.value - store.randomDetail
   };
   
   

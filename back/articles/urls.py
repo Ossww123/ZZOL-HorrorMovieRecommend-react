@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     path('articles/', views.article_list),
     path('articles/<int:article_pk>/', views.article_detail),
+    path('articles/<int:article_pk>/recommends/', views.recommends),
     path('movies/<int:movie_pk>/', views.movie_detail),
     # 영화 출력 및 데이터 생성 경로
     path('movies/', views.save_movies_to_db),
@@ -25,4 +26,6 @@ urlpatterns = [
     # 댓글 경로
     path('<int:review_pk>/comments/', views.comment),
     path('<int:review_pk>/comments/<int:comment_pk>/', views.comment_update),
+    path('articles/<int:article_id>/comments/', views.article_comments),
+    path('articles/<int:article_id>/comments/<int:comment_pk>/', views.article_comment_update),
 ]

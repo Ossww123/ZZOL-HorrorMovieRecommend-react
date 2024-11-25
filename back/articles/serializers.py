@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from .models import Article
 from rest_framework import serializers
-from .models import Movie, Comment, Review
+from .models import Movie, Comment, Review, ArticleComment
 from django.contrib.auth import get_user_model
 
 # User 시리얼라이저
@@ -72,11 +72,37 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('content', 'user_nickname', )
         read_only_fields = ('user', )
 
+
+class ArticleCommentListSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ArticleComment
+        fields = '__all__'
+        read_only_fields = ('user', )
+    
+    def get_user(self, obj):
+        return {
+            'id': obj.user.id,
+            'nickname': obj.user.nickname
+        }
+
+class ArticleCommentSerializer(serializers.ModelSerializer):
+    user_nickname = serializers.CharField(source='user.nickname', read_only=True)
+    
+    class Meta:
+        model = ArticleComment
+        fields = ('content', 'user_nickname', )
+        read_only_fields = ('user', )
+
+
+
+
 class ArticleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = '__all__'
-        read_only_fields = ('user',)
+        read_only_fields = ('user', 'recommend_users')
 
     def create(self, validated_data):
         # 게시글을 저장할 때 현재 로그인한 사용자를 자동으로 저장
@@ -88,4 +114,4 @@ class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = '__all__'
-        read_only_fields = ('user',)
+        read_only_fields = ('user', 'recommend_users')

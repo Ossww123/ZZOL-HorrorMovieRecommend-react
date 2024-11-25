@@ -17,6 +17,7 @@ export const useCounterStore = defineStore('counter', () => {
   const fearMovies = ref([])
   const reviews = ref([])
   const comments = ref([])
+  const articleComments = ref([])
   const API_URL = 'http://127.0.0.1:8000'
   const token = ref(null)
   const profileImage = ref(""); // 프로필 이미지 상태 추가
@@ -84,6 +85,25 @@ export const useCounterStore = defineStore('counter', () => {
           console.log(res.data);
           comments.value = res.data;
           console.log(comments.value);
+        })
+        .catch((err) => {
+          console.log("댓글 에러");
+          console.log(err);
+        });
+    };
+
+    const getArticleComments = function (article_pk) {
+      axios
+        .get(`${API_URL}/api/v1/articles/${article_pk}/comments/`, {
+          headers: {
+            Authorization: `Token ${token.value}`,
+          },
+        })
+        .then((res) => {
+          console.log("여기 댓글 있어요");
+          console.log(res.data);
+          articleComments.value = res.data;
+          console.log(articleComments.value);
         })
         .catch((err) => {
           console.log("댓글 에러");
@@ -291,7 +311,7 @@ export const useCounterStore = defineStore('counter', () => {
     };
 
 
-  return { articles, API_URL, reviews, comments, popularMovies, latestMovies, ratingMovies, fearMovies, randomDetail, randomReviews, getRandomMovieReviews, getRandomDetail, getRandomMovies, getMovieList, getReviewComments, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById, getMovieDetail, movieDetail, fetchUserProfile,
+  return { articles, API_URL, reviews, comments, popularMovies, latestMovies, ratingMovies, fearMovies, randomDetail, randomReviews, articleComments, getArticleComments, getRandomMovieReviews, getRandomDetail, getRandomMovies, getMovieList, getReviewComments, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById, getMovieDetail, movieDetail, fetchUserProfile,
       profileImage,
       nickname,
       email,  }

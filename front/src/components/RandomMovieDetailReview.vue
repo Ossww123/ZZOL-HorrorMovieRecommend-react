@@ -46,6 +46,7 @@
         :key="review.id"
         :review="review"
         :tmdb_id="tmdb_id"
+        @reviewDeleted="onReviewDeleted"
       />
     </div>
   </template>
@@ -64,7 +65,7 @@
     const fear_score = ref(null)
     const router = useRouter()
   
-    const emit = defineEmits(['reviewCreated'])
+    const emit = defineEmits(['reviewChange'])
   
     defineProps({
         tmdb_id: String
@@ -91,7 +92,7 @@
           content.value = ''
           rate.value = null
           fear_score.value = null
-          emit('reviewCreated')
+          emit('reviewChange')
         })
         .catch((err) => {
           if (err.response.data.error) {
@@ -99,7 +100,12 @@
       }
         })
       }
-  
+      
+      const onReviewDeleted = async () => {
+        await store.getRandomMovieReviews(tmdb_id)
+        await store.getRandomMovieDetail(tmdb_id)
+        emit('reviewChange')
+      }
   </script>
   
   <style scoped>

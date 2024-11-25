@@ -22,13 +22,15 @@
   
   
   const store = useCounterStore();
+
+  const emit = defineEmits(['reviewChange'])
   
   defineProps({
     review: Object,
     tmdb_id: String
   })
   
-  const deleteReview = function (tmdb_id, reviewId) {
+  const deleteReview = async function (tmdb_id, reviewId) {
     axios({
           method: 'delete'  ,
           url: `${store.API_URL}/api/v1/random/${tmdb_id}/reviews/${reviewId}/` , 
@@ -36,17 +38,11 @@
             Authorization: `Token ${store.token}`
           }
         })
-        .then((res) => {
           console.log("제발 됬다고 말해222222")
-          store.getRandomMovieReviews(tmdb_id)
-          store.getRandomMovies()
-        })
-        .catch((err) => {
-          console.log("응 안돼 돌아가22222")
-          console.log(tmdb_id, reviewId)
-          console.log(err)
-        })
-      }
+          await store.getRandomMovieReviews(tmdb_id)
+          emit('reviewDeleted')
+          window.alert('성공')
+        }
   
   </script>
   

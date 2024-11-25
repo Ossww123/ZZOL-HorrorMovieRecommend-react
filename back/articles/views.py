@@ -1,6 +1,7 @@
 # back/articles/views.py
 import random
 import json
+from re import A
 import requests
 from pprint import pprint as pp
 from rest_framework import status
@@ -12,8 +13,8 @@ from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from openai import OpenAI
-from .models import Article, Movie, Director, Actor, Comment, Review
-from .serializers import ArticleListSerializer, ArticleSerializer, CommentListSerializer, MovieListSerializer, MovieSerializer, ReviewSerializer, CommentSerializer
+from .models import Article, Movie, Director, Actor, Comment, Review, ArticleComment
+from .serializers import ArticleListSerializer, ArticleSerializer, CommentListSerializer, MovieListSerializer, MovieSerializer, ReviewSerializer, CommentSerializer, ArticleCommentListSerializer, ArticleCommentSerializer
 
 # TMDB API 설정
 TMDB_API_URL = 'https://api.themoviedb.org/3'
@@ -555,4 +556,64 @@ def actor_info(request, actor_pk):
         'name': actor.name,
         'original_name': actor.original_name,
         'profile_path': actor.profile_path
+    })
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def article_comments(request, article_id):
+    # 1개의 리뷰에 댓글이 달릴거니까 가져오고
+    article = get_object_or_404(Article, id=article_id)
+    # get이면 리뷰에 달린 댓글을 출력합니다.
+    if request.method == 'GET':
+        comments = ArticleComment.objects.filter(article=article)
+        serializer = ArticleCommentListSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    # post면 리뷰에 댓글을 생성합니다.
+    elif request.method == 'POST':
+        if check_inappropriate_content(request.data['content']):
+            return Response({'error': '부적절한 내용이 포함된 댓글은 작성할 수 없습니다'}, 
+                       status=status.HTTP_400_BAD_REQUEST)
+
+
+        serializer = ArticleCommentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user, article=article)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+@api_view(['PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def article_comment_update(request, article_id, comment_pk):
+    comment = get_object_or_404(ArticleComment, pk=comment_pk)
+    
+    # 댓글 작성자만 수정/삭제 가능
+    if comment.user != request.user:
+        return Response({'error': '니가 뭔데 여길 와'}, 
+                      status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == 'PUT':
+        serializer = ArticleCommentSerializer(comment, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+
+    elif request.method == 'DELETE':
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def recommends(request, article_pk):
+    article = Article.objects.get(pk=article_pk)
+    if request.user in article.recommend_users.all():
+        article.recommend_users.remove(request.user)
+        is_recommended = False
+    else:
+        article.recommend_users.add(request.user)
+        is_recommended = True
+    
+    return Response({
+        'is_recommended': is_recommended,
+        'recommend_count': article.recommend_users.count()
     })
