@@ -7,11 +7,18 @@
       :article="article"
     />
   </div>
+  <!-- 임시로 여기 넣었음... -->
+  <div>
+    <RandomTrailer />
+  </div>
 </template>
 
 <script setup>
 import ArticleListItem from "@/components/ArticleListItem.vue";
 import { useCounterStore } from "@/stores/counter";
+
+// 임시로 여기 넣었음...
+import RandomTrailer from "./RandomTrailer.vue";
 
 const store = useCounterStore();
 </script>

@@ -85,6 +85,22 @@
           </p>
         </div>
 
+        <!-- Profile Image -->
+        <div class="flex flex-col">
+          <label for="profileimage" class="text-sm text-black mb-1"
+            >Profile Image :</label
+          >
+          <input
+            type="file"
+            id="profileimage"
+            @change="handleImageUpload"
+            class="p-2 border border-gray-300 rounded-md text-black"
+          />
+          <p v-if="errors.profileimage" class="text-red-500 text-xs mt-1">
+            {{ errors.profileimage }}
+          </p>
+        </div>
+
         <!-- Submit Button -->
         <input
           type="submit"
@@ -104,6 +120,7 @@
   </div>
 </template>
 <script setup>
+import axios from "axios"; // axios import 추가
 import { ref } from "vue";
 import { useCounterStore } from "@/stores/counter";
 
@@ -112,6 +129,7 @@ const email = ref(null);
 const password1 = ref(null);
 const password2 = ref(null);
 const nickname = ref(null);
+const profileimage = ref(null); // 프로필 이미지 상태 변수 추가
 
 const errors = ref({
   username: null,
@@ -134,6 +152,10 @@ const isValidEmail = (email) => {
 // 비밀번호 일치 확인
 const passwordsMatch = (password1, password2) => {
   return password1 === password2;
+};
+
+const handleImageUpload = (event) => {
+  profileimage.value = event.target.files[0]; // 업로드된 첫 번째 파일을 profileimage에 저장
 };
 
 // 폼 검증 함수
@@ -185,6 +207,11 @@ const validateForm = () => {
     valid = false;
   }
 
+  if (!profileimage.value) {
+    errors.value.profileimage = "프로필 이미지를 선택하세요.";
+    valid = false;
+  }
+
   return valid;
 };
 
@@ -196,19 +223,30 @@ const signUp = async () => {
 
   isSubmitting.value = true;
 
-  const payload = {
-    username: username.value,
-    email: email.value,
-    password1: password1.value,
-    password2: password2.value,
-    nickname: nickname.value,
-  };
+  // FormData 생성
+  const formData = new FormData();
+  formData.append("username", username.value);
+  formData.append("email", email.value);
+  formData.append("password1", password1.value);
+  formData.append("password2", password2.value);
+  formData.append("nickname", nickname.value);
+  if (profileimage.value) {
+    formData.append("profileimage", profileimage.value); // 프로필 이미지가 있을 경우 추가
+  }
 
   try {
-    await store.signUp(payload);
-    // 회원가입 성공 후 처리 (예: 성공 메시지, 리디렉션 등)
+    // 요청 보내기
+    await axios.post("http://127.0.0.1:8000/accounts/signup/", formData, {
+      headers: {
+        Accept: "application/json",
+        // 'Content-Type'은 FormData를 사용할 때 자동으로 설정되므로 제거
+      },
+    });
   } catch (error) {
-    // 에러 처리 (예: 서버 오류 메시지 등)
+    console.error(
+      "Error during sign up:",
+      error.response ? error.response.data : error
+    );
   } finally {
     isSubmitting.value = false;
   }
