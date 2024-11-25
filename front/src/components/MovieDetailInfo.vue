@@ -121,7 +121,7 @@
     <p class="text-lg text-gray-400">영화를 찾을 수 없습니다.</p>
   </div>
 
-  <MovieDetailReview :movie_pk="movieId" @reviewCreated="updateMovieData" />
+  <MovieDetailReview :movie_pk="movieId" @reviewChange="updateMovieData" />
 </template>
 
 <style scoped>
@@ -293,11 +293,10 @@ onMounted(async () => {
 });
 
 const updateMovieData = async () => {
-  store.getMovieReviews(movieId); // 해당 영화의 리뷰 업데이트
-  store.getMovies(); // 전체 영화 정보 업데이트
-  store.getMovieDetail(movieId);
-};
-
+    await store.getMovieReviews(movieId)  // 리뷰 목록 갱신
+    await store.getMovieDetail(movieId)    // 영화 정보 갱신
+    movie.value = store.movieDetail        // 화면 갱신
+}
 
 // 예고편 모달 열기
 const openTrailerModal = () => {

@@ -16,9 +16,12 @@ urlpatterns = [
     path('recommend/', views.recommend_movies, name='recommend_movies'),
     path('movielist/', views.movie_list),
     path('random/', views.random_movie),
+    path('random/<int:tmdb_id>/', views.random_detail),
     # 리뷰 경로
     path('<int:movie_pk>/reviews/', views.review),
     path('<int:movie_pk>/reviews/<int:review_pk>/', views.review_update),
+    path('random/<int:tmdb_id>/reviews/', views.random_review),
+    path('random/<int:tmdb_id>/reviews/<int:review_pk>/', views.random_review_update),
     # 댓글 경로
     path('<int:review_pk>/comments/', views.comment),
     path('<int:review_pk>/comments/<int:comment_pk>/', views.comment_update),

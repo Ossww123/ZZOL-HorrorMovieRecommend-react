@@ -439,6 +439,107 @@ def random_movie(request):
 
 
 @api_view(['GET'])
+def random_detail(request, tmdb_id):
+    try:
+        # DB에서 영화 검색
+        movie = Movie.objects.get(tmdb_Id=tmdb_id)
+        serializer = MovieSerializer(movie)
+        return Response(serializer.data)
+    except Movie.DoesNotExist:
+        # DB에 없는 경우 TMDB에서 영화 정보 가져오기
+        url = f'{TMDB_API_URL}/movie/{tmdb_id}?api_key={TMDB_API_KEY}&language=ko-KR'
+        movie_data = requests.get(url).json()
+        
+        # 영화 데이터 저장
+        movie = Movie.objects.create(
+            tmdb_Id=tmdb_id,
+            title=movie_data['title'],
+            original_title=movie_data['original_title'],
+            release_date=movie_data.get('release_date', '0001-01-01'),
+            popularity=movie_data['popularity'],
+            tmdb_vote_sum=movie_data['vote_average'],
+            tmdb_vote_cnt=movie_data['vote_count'],
+            overview=movie_data['overview'],
+            poster_path=movie_data['poster_path'],
+            backdrop_path=movie_data['backdrop_path'],
+            adult=movie_data['adult'],
+            user_vote_sum=0,
+            user_vote_cnt=0,
+            fear_index=0
+        )
+        
+        # 감독과 배우 정보 저장
+        credits = fetch_movie_credits(tmdb_id)
+        if credits:
+            # 감독 정보 저장
+            directors = [crew for crew in credits.get('crew', []) if crew['job'] == 'Director']
+            for director_data in directors:
+                director, _ = Director.objects.get_or_create(
+                    name=director_data['name'],
+                    original_name=director_data.get('original_name', director_data['name']),
+                    profile_path=director_data['profile_path']
+                )
+                movie.movie_director.add(director)
+            
+            # 배우 정보 저장 (상위 5명)
+            actors = credits.get('cast', [])[:5]
+            for actor_data in actors:
+                actor, _ = Actor.objects.get_or_create(
+                    name=actor_data['name'],
+                    original_name=actor_data.get('original_name', actor_data['name']),
+                    profile_path=actor_data['profile_path']
+                )
+                movie.movie_actor.add(actor)
+        
+        serializer = MovieSerializer(movie)
+        return Response(serializer.data)
+    
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def random_review(request, tmdb_id):
+    movie = get_object_or_404(Movie, tmdb_Id=tmdb_id)
+    if request.method == 'GET':
+        reviews = Review.objects.filter(movie=movie)
+        serializer = ReviewListSerializer(reviews, many=True)
+        pp(serializer.data)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        if Review.objects.filter(user=request.user, movie=movie).exists():
+            return Response({'error' : '나가 임마'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if check_spoiler(request.data['content']):
+            return Response({'error': '스포일러가 포함된 리뷰는 작성할 수 없습니다'}, 
+                       status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=request.user, movie=movie)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['PUT', 'DELETE'])    
+@permission_classes([IsAuthenticated])
+def random_review_update(request, tmdb_id, review_pk):
+    review = Review.objects.get(pk=review_pk)
+    # 리뷰 작성자만 수정/삭제 가능
+    if review.user != request.user:
+        return Response({'error': '니가 뭔데'}, 
+                      status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == 'PUT':
+        serializer = ReviewSerializer(review, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+
+    elif request.method == 'DELETE':
+        review.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+@api_view(['GET'])
 def director_info(request, director_pk):
     director = get_object_or_404(Director, pk=director_pk)
     return Response({

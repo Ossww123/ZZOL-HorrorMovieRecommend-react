@@ -4,7 +4,7 @@
       <div v-if="randomMovies" v-for="(movies, category) in randomMovies" :key="category" class="category">
         <h2>오늘은 "{{ category }}"!</h2>
         <div class="movie-grid">
-          <div v-for="movie in movies" :key="movie.id" class="movie-card">
+          <div v-for="movie in movies" :key="movie.id" class="movie-card" @click="saveAndNavigate(movie)">
             <img 
               :src="`https://image.tmdb.org/t/p/w300${movie.poster_path}`" 
               :alt="movie.title"
@@ -24,9 +24,11 @@
   <script setup>
   import { useCounterStore } from '@/stores/counter'
   import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router';
   
   const store = useCounterStore()
   const randomMovies = ref(null)
+  const router = useRouter()
   
   const fetchRandomMovies = async () => {
     try {
@@ -38,6 +40,16 @@
     }
   }
   
+  const saveAndNavigate = async (movie) => {
+  try {
+    await store.getRandomDetail(movie.id)
+    router.push(`/random/${movie.id}`)
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
+
   onMounted(() => {
     fetchRandomMovies()
   })

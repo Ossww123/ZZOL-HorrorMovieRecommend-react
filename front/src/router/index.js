@@ -1,17 +1,19 @@
 // router/index.js
-import { createRouter, createWebHistory } from "vue-router";
-import ArticleView from "@/views/ArticleView.vue";
-import DetailView from "@/views/DetailView.vue";
-import CreateView from "@/views/CreateView.vue";
-import SignUpView from "@/views/SignUpView.vue";
-import LogInView from "@/views/LogInView.vue";
-import { useCounterStore } from "@/stores/counter";
-import MovieDetailView from "@/views/MovieDetailView.vue";
-import MovieListView from "@/views/MovieListView.vue";
-import ReviewSearchView from "@/views/ReviewSearchView.vue";
-import RecommendedView from "@/views/RecommendedView.vue";
-import HomeView from "@/views/HomeView.vue";
-import RandomTestView from "@/views/RandomTestView.vue";
+
+import { createRouter, createWebHistory } from 'vue-router'
+import ArticleView from '@/views/ArticleView.vue'
+import DetailView from '@/views/DetailView.vue'
+import CreateView from '@/views/CreateView.vue'
+import SignUpView from '@/views/SignUpView.vue'
+import LogInView from '@/views/LogInView.vue'
+import { useCounterStore } from '@/stores/counter'
+import MovieDetailView from '@/views/MovieDetailView.vue'
+import MovieListView from '@/views/MovieListView.vue'
+import ReviewSearchView from '@/views/ReviewSearchView.vue'
+import RecommendedView from '@/views/RecommendedView.vue'
+import HomeView from '@/views/HomeView.vue'
+import RandomTestView from '@/views/RandomTestView.vue'
+import RandomMovieDetailView from '@/views/RandomMovieDetailView.vue'
 import ProfileView from "@/views/ProfileView.vue";
 
 const router = createRouter({
@@ -74,8 +76,14 @@ const router = createRouter({
       name: "ProfileView",
       component: ProfileView,
     },
-  ],
-});
+
+    {
+      path: '/random/:movie_id',
+      component: RandomMovieDetailView
+    },
+  ]
+})
+
 
 // 로그인 관련 페이지 막기 일단 주석 처리하기
 
