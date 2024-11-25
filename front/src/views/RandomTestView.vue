@@ -24,7 +24,7 @@
   <script setup>
   import { useCounterStore } from '@/stores/counter'
   import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router';
+  import { useRouter } from 'vue-router';
   
   const store = useCounterStore()
   const randomMovies = ref(null)

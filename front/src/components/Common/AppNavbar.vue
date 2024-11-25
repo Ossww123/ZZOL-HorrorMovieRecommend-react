@@ -14,6 +14,9 @@
         >Articles</RouterLink
       >
       <RouterLink to="/movies" class="hover:text-gray-400">Movies</RouterLink>
+
+
+      <!--
       <RouterLink to="/review-search" class="hover:text-gray-400"
         >리뷰 검색</RouterLink
       >
@@ -21,6 +24,8 @@
         >영화 추천</RouterLink
       >
       <RouterLink to="/random" class="hover:text-gray-400">랜덤</RouterLink>
+
+      -->
     </div>
 
     <!-- 로그인 상태에 따라 검색 창 위치 조정 -->

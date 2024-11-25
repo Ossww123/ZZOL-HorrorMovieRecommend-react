@@ -1,5 +1,5 @@
 <template>
-  <h1>전체 영화 목록 페이지</h1>
+  <h1 class="text-center text-4xl font-bold mb-4">전체 영화 목록 페이지</h1>
 
   <!-- 검색 결과가 없을 때 표시할 메시지 -->
   <div v-if="paginatedMovies.length === 0 && !isLoading" class="text-center">
@@ -55,6 +55,7 @@
     </button>
   </div>
 </template>
+
 
 <script setup>
 import { useCounterStore } from "@/stores/counter";
@@ -211,5 +212,14 @@ body {
 .page-button:disabled {
   background-color: #666;
   cursor: not-allowed;
+}
+
+/* 제목 스타일 */
+h1 {
+  text-align: center; /* 가운데 정렬 */
+  font-size: 4rem; /* 글자 크기 키우기 */
+  font-weight: bold; /* 굵은 글씨 */
+  margin-top: 20px;
+  margin-bottom: 40px; /* 아래 여백 추가 */
 }
 </style>
