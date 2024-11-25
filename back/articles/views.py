@@ -394,13 +394,13 @@ def comment_update(request, review_pk, comment_pk):
 def movie_list(request):
     sort_by = request.query_params.get('sort', 'popularity')
     if sort_by == 'popularity':
-        movies = Movie.objects.all().order_by('-popularity')[:5]
+        movies = Movie.objects.all().order_by('-popularity')[:10]
     elif sort_by == 'latest':
-        movies = Movie.objects.all().order_by('-release_date')[:5]
+        movies = Movie.objects.all().order_by('-release_date')[:10]
     elif sort_by == 'rating':
-        movies = Movie.objects.all().order_by('-tmdb_vote_sum')[:5]
+        movies = Movie.objects.all().order_by('-tmdb_vote_sum')[:10]
     elif sort_by == 'fear':
-        movies = Movie.objects.all().order_by('-fear_index')[:5]
+        movies = Movie.objects.all().order_by('-fear_index')[:10]
     
     serializer = MovieListSerializer(movies, many=True)
     return Response(serializer.data)
@@ -434,7 +434,7 @@ def random_movie(request):
         }
         
         response = requests.get('https://api.themoviedb.org/3/discover/movie', params=params)
-        movies = response.json()['results'][:8]
+        movies = response.json()['results'][:10]
         results[horror_keywords[keyword]['name']] = movies
     return Response(results)
 
