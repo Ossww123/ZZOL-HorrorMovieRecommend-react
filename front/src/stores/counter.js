@@ -310,10 +310,36 @@ export const useCounterStore = defineStore('counter', () => {
       return movie;
     };
 
+    const searchArticles = async function (keyword) {
+      try {
+        const response = await axios({
+          method: 'get',
+          url: `${API_URL}/api/v1/articles/`,
+          headers: {
+            Authorization: `Token ${token.value}`
+          }
+        })
+        
+        // 검색어가 있는 경우 필터링
+        if (keyword) {
+          const filtered = response.data.filter(article => 
+            article.title.toLowerCase().includes(keyword.toLowerCase()) ||
+            article.content.toLowerCase().includes(keyword.toLowerCase())
+          )
+          articles.value = filtered
+        } else {
+          articles.value = response.data
+        }
+        
+        return articles.value
+      } catch (err) {
+        console.log(err)
+        return []
+      }
+    }
 
-  return { articles, API_URL, reviews, comments, popularMovies, latestMovies, ratingMovies, fearMovies, randomDetail, randomReviews, articleComments, getArticleComments, getRandomMovieReviews, getRandomDetail, getRandomMovies, getMovieList, getReviewComments, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById, getMovieDetail, movieDetail, fetchUserProfile,
-      profileImage,
-      nickname,
-      email,  }
+
+  return { articles, API_URL, reviews, comments, popularMovies, latestMovies, ratingMovies, fearMovies, randomDetail, randomReviews, articleComments, getArticleComments, getRandomMovieReviews, getRandomDetail, getRandomMovies, getMovieList, getReviewComments, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById, getMovieDetail, movieDetail, fetchUserProfile, 
+    profileImage, nickname, email, searchArticles }
 }, { persist: true })
 

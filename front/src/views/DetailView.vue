@@ -8,7 +8,7 @@
       <p>작성일 : {{ article.created_at }}</p>
       <p>수정일 : {{ article.updated_at }}</p>
       <button @click="Recommend(article.id)">
-      {{ isRecommended ? '추천 취소' : '추천' }}
+      {{ isRecommended ? '추천' : '추천' }}
       ({{ recommendCount }})
       </button>
       <ArticleCommentList
@@ -47,23 +47,52 @@ onMounted(() => {
 })
 
 
-const Recommend = function(articleId) {
-  axios({
-    method: 'post',
-    url: `${store.API_URL}/api/v1/articles/${articleId}/recommends/`,
-    headers: {
-      Authorization: `Token ${store.token}`
-    }
-  })
-  .then((res) => {
-    isRecommended.value = res.data.is_recommended
-    recommendCount.value = res.data.recommend_count
-  })
-  .catch((err) => {
+const Recommend = async function(articleId) {
+  try {
+    const response = await axios({
+      method: 'post',
+      url: `${store.API_URL}/api/v1/articles/${articleId}/recommends/`,
+      headers: {
+        Authorization: `Token ${store.token}`
+      }
+    })
+    isRecommended.value = !isRecommended.value
+    recommendCount.value = response.data.recommend_count
+    
+    // 추천 상태 변경 후 게시글 정보 업데이트
+    const articleResponse = await axios({
+      method: 'get',
+      url: `${store.API_URL}/api/v1/articles/${articleId}/`
+    })
+    article.value = articleResponse.data
+  } catch (err) {
     console.log(err)
-  })
+  }
 }
 
+
+
+// 현재 사용자의 추천 상태 확인
+const checkRecommendStatus = () => {
+  if (article.value && article.value.recommend_users) {
+    isRecommended.value = article.value.recommend_users.includes(store.user_id)
+    recommendCount.value = article.value.recommend_users.length
+  }
+}
+
+
+onMounted(async () => {
+  try {
+    const response = await axios({
+      method: 'get',
+      url: `${store.API_URL}/api/v1/articles/${route.params.id}/`
+    })
+    article.value = response.data
+    checkRecommendStatus()
+  } catch (err) {
+    console.log(err)
+  }
+})
 </script>
 
 <style>

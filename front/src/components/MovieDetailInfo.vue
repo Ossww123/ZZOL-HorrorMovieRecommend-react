@@ -77,8 +77,7 @@
             :alt="directors[directorId].name"
           >
           <div class="director-info">
-            <p>{{ directors[directorId].name }}</p>
-            <p>{{ directors[directorId].original_name }}</p>
+            <p>{{ isKorean(directors[directorId].name) ? directors[directorId].name : directors[directorId].original_name }}</p>
           </div>
         </div>
       </div>
@@ -95,8 +94,7 @@
           :alt="actors[actorId].name"
         >
         <div class="actor-info">
-          <p>{{ actors[actorId].name }}</p>
-          <p>{{ actors[actorId].original_name }}</p>
+          <p>{{ isKorean(actors[actorId].name) ? actors[actorId].name : actors[actorId].original_name }}</p>
         </div>
       </div>
     </div>
@@ -234,6 +232,11 @@ const getActor = async (actorIds) => {
     actors.value[actorId] = response.data
   }
 }
+
+const isKorean = (text) => {
+  const koreanRegex = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+  return koreanRegex.test(text);
+};
 
 const genreList = [
   { id: 28, name: "액션" },

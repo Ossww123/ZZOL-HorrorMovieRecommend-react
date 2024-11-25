@@ -13,7 +13,7 @@
         >
         <div class="movie-info">
           <h3>{{ movie.title }}</h3>
-          <p>평점: {{ movie.vote_average }}</p>
+          <p>평점: {{ movie.popularity }}</p>
         </div>
       </div>
     </div>
@@ -32,7 +32,7 @@
         >
         <div class="movie-info">
           <h3>{{ movie.title }}</h3>
-          <p>평점: {{ movie.vote_average }}</p>
+          <p>평점: {{ movie.release_date }}</p>
         </div>
       </div>
     </div>

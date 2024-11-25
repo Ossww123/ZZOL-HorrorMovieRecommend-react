@@ -4,21 +4,39 @@
     <RouterLink :to="{ name: 'CreateView' }" class="create-link"
       >Create</RouterLink
     >
-    <ArticleList />
+    <div class="search-box">
+      <input 
+        type="text" 
+        v-model="searchKeyword"
+        @input="handleSearch"
+        placeholder="검색어를 입력하세요"
+      >
+    </div>
+    <ArticleList :articles="filteredArticles" />
   </div>
 </template>
 
 <script setup>
 import ArticleList from "@/components/ArticleList.vue";
-import { onMounted } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useCounterStore } from "@/stores/counter";
 import { RouterLink } from "vue-router";
+import { debounce } from "lodash";
 
 const store = useCounterStore();
+const searchKeyword = ref('')
+const filteredArticles = ref([])
+
+const handleSearch = debounce(async () => {
+  const results = await store.searchArticles(searchKeyword.value)
+  filteredArticles.value = results
+}, 300)
+
 
 onMounted(() => {
   // mount 되기전에 store에 있는 전체 게시글 요청 함수를 호출
   store.getArticles();
+  handleSearch()
 });
 </script>
 
@@ -43,5 +61,16 @@ h1 {
 
 .create-link:hover {
   background-color: #c53030;
+}
+
+.search-box {
+  margin: 20px 0;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 </style>
