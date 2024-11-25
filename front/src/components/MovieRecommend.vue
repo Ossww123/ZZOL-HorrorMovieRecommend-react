@@ -1,6 +1,6 @@
 <template>
-  <div class="movie-recommend container mx-auto p-6 bg-gray-900 text-white">
-    <h1 class="text-3xl font-bold text-red-600 mb-6">영화 추천 서비스</h1>
+  <div class="movie-recommend container mx-auto p-6 text-white">
+    <h1 class="text-3xl font-bold mb-6">영화 추천 서비스</h1>
 
     <form
       @submit.prevent="handleRecommend"

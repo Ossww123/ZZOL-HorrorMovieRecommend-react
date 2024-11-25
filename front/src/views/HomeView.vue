@@ -1,88 +1,134 @@
-<!-- HomeView.vue -->
 <template>
-  <div class="bg-black h-screen text-white relative" @mousemove="moveImage">
-    <!-- 중앙에 배치된 텍스트 -->
-    <p class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-      <span class="text-red-500">공포</span>를 위한<br>
-      영화 추천 서비스<br>
-      <span class="text-orange-500 text-7xl">ZZOL</span>
-    </p>
-    
-    <!-- 마우스 따라 움직이는 배경 이미지 -->
-    <img
-      src="@/assets/background3.png"
-      alt="Dynamic Image"
-      :style="{ transform: `translate(${imagePosition3.x}px, ${imagePosition3.y}px)`, position: 'absolute', top: '50%', left: '50%', transform: `translate(-50%, -50%)` }"
-      class="absolute w-full h-full object-cover z-0"
-    />
-    
-    <!-- 마우스 따라 움직이는 다른 이미지들 -->
+  <div class="main-container bg-black text-white relative" @mousemove="moveImage">
+    <!-- 좌측 움직이는 이미지 -->
     <img
       src="@/assets/ghost1.png"
-      alt="Dynamic Image"
-      :style="{ transform: `translate(${imagePosition1.x}px, ${imagePosition1.y}px)` }"
-      class="absolute w-64 h-96 z-10"
+      alt="Left Ghost"
+      :style="{
+        transform: `translate(${imagePosition1.x}px, ${imagePosition1.y}px)`,
+        width: `${imageWidth}vw`,
+        left: `${sideSpace}px`
+      }"
+      class="absolute z-10"
     />
+
+    <!-- 우측 움직이는 이미지 -->
     <img
       src="@/assets/ghost2.png"
-      alt="Dynamic Image"
-      :style="{ transform: `translate(${imagePosition2.x}px, ${imagePosition2.y}px)` }"
-      class="absolute w-64 h-96 z-10"
+      alt="Right Ghost"
+      :style="{
+        transform: `translate(${imagePosition2.x}px, ${imagePosition2.y}px)`,
+        width: `${imageWidth}vw`,
+        right: `${sideSpace}px`
+      }"
+      class="absolute z-10"
     />
+    
+    <!-- 중앙에 배치된 콘텐츠를 감싸는 컨테이너 -->
+    <div :style="containerStyle" class="content-container">
+      <Welcome />
+      <MovieRecommend />
+      <Home_RandomTest class="z-20" />
+      <Home_PopularLatestTest class="z-20" />
+      <RandomTrailer />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import MovieRecommend from '@/components/MovieRecommend.vue';
+import Home_RandomTest from '@/components/Home_RandomTest.vue';
+import { ref, computed } from 'vue';
+import RandomTrailer from '@/components/RandomTrailer.vue';
+import Home_PopularLatestTest from '@/components/Home_PopularLatestTest.vue';
+import Welcome from '@/components/Welcome.vue';
 
-const imagePosition1 = ref({ x: (window.innerWidth / 2) - 1030, y: (window.innerHeight / 2) - 520});
-const imagePosition2 = ref({ x: (window.innerWidth / 2) + 500, y: (window.innerHeight / 2) - 500});
-const imagePosition3 = ref({ x: 0, y: 0 });
+const imagePosition1 = ref({ x: 0, y: 0 });
+const imagePosition2 = ref({ x: 0, y: 0 });
+const imageWidth = ref(10);
+
+// 화면 크기에 따른 사이드 여백 계산
+const sideSpace = computed(() => {
+  const width = window.innerWidth;
+  return Math.max(width * 0.05, 20); // 최소 20px, 화면 너비의 5%
+});
 
 const moveImage = (event) => {
   const { clientX, clientY } = event;
-  // 화면의 중앙을 기준으로 이미지 위치를 이동
-  imagePosition1.value.x = (clientX - window.innerWidth / 2) / 10 + window.innerWidth / 10; // 10은 이동 속도
-  imagePosition1.value.y = (clientY - window.innerHeight / 2) / 10 + window.innerHeight / 10;
+  const scrollY = window.scrollY;
 
-  imagePosition2.value.x = (clientX - window.innerWidth / 2) / 10 + window.innerWidth / 10 * 7;; // 10은 이동 속도
-  imagePosition2.value.y = (clientY - window.innerHeight / 2) / 10 + window.innerHeight / 10;
+  // 이미지 움직임 범위를 제한하여 컨텐츠를 덜 가리도록 조정
+  const maxMove = window.innerWidth * 0.05; // 최대 이동 거리를 화면 너비의 5%로 제한
 
-  imagePosition3.value.x = window.innerWidth / 4 // 10은 이동 속도
-  imagePosition3.value.y = (clientY*0.2 - window.innerHeight / 2) / 10 + window.innerHeight / 10;
+  // 왼쪽 이미지의 x 위치 계산 수정
+  const leftX = ((clientX - window.innerWidth / 2) / 15) - window.innerWidth / 20;
+  imagePosition1.value.x = Math.min(Math.max(leftX, -maxMove), maxMove);
+  
+  // 오른쪽 이미지의 x 위치 계산
+  const rightX = ((clientX - window.innerWidth / 2) / 15) + window.innerWidth / 20;
+  imagePosition2.value.x = Math.min(Math.max(rightX, -maxMove), maxMove);
+
+  // y 위치는 동일하게 유지
+  imagePosition1.value.y = (clientY - window.innerHeight / 2) / 10 + scrollY * 1 + window.innerHeight/10;
+  imagePosition2.value.y = (clientY - window.innerHeight / 2) / 10 + scrollY * 1 + window.innerHeight/10;
 };
+
+const containerStyle = computed(() => {
+  const width = window.innerWidth;
+  let containerWidth = 1500;
+  
+  if (width < 1500) {
+    containerWidth = width * 0.67;
+  } else if (width < 1200) {
+    containerWidth = width * 0.67;
+  }
+
+  // 양쪽 패딩을 추가하여 이미지를 위한 공간 확보
+  const sidePadding = `${sideSpace.value * 1.5}px`;
+
+  return {
+    maxWidth: `${containerWidth}px`,
+    width: '100%',
+    margin: '0 auto',
+    padding: `0 ${sidePadding}`, // 양쪽 패딩 추가
+  };
+});
+
+// 화면 크기에 따른 이미지 크기 조정
+const updateImageSize = () => {
+  const width = window.innerWidth;
+  imageWidth.value = Math.min(width * 0.08, 10); // 최대 10vw, 화면 너비의 8%
+};
+
+window.addEventListener('resize', () => {
+  updateImageSize();
+});
+
+// 초기 이미지 크기 설정
+updateImageSize();
 </script>
 
 <style scoped>
-/* 이미지가 부드럽게 움직이도록 transition 추가 */
+.main-container {
+  position: relative;
+  min-height: 100vh;
+  background-color: black;
+  width: 100%;
+  height: 100%;
+}
+
 img {
   transition: transform 0.1s ease-out;
 }
 
-/* 텍스트를 화면 중앙에 배치 */
-p {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10; /* 텍스트가 배경보다 위에 오도록 설정 */
-  font-size: 50px;
-  text-align: center;
-  color: white;
-  width: 100%; /* 텍스트가 화면을 가득 채우도록 설정 */
+.content-container {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
 }
 
-/* 공포 텍스트 빨간색 */
-.text-red-500 {
-  color: red;
-}
-
-/* ZZOL 텍스트 주황색, 폰트 크기 70px */
-.text-orange-500 {
-  color: orange;
-}
-
-.text-7xl {
-  font-size: 70px;
+.MovieRecommend, .Home_RandomTest, .RandomTrailer {
+  width: 100%;
+  height: 100%;
 }
 </style>

@@ -6,7 +6,7 @@
     <p class="text-lg text-gray-400">Loading...</p>
   </div>
 
-  <div v-else class="container mx-auto p-6 bg-gray-900 text-white">
+  <div v-else class="container mx-auto p-6 text-white">
     <h1 class="text-center text-2xl font-bold mb-4">랜덤 영화 예고편</h1>
 
     <!-- 랜덤 예고편 표시 -->
@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted,  onBeforeUnmount,ref } from "vue";
 import { useCounterStore } from "@/stores/counter"; // store 가져오기
 import axios from "axios";
 
@@ -88,8 +88,21 @@ const getRandomTrailer = async () => {
   }
 };
 
+// 오른쪽 방향키로 다음 예고편을 불러오는 이벤트 리스너
+const handleKeyDown = (event) => {
+  if (event.key === "ArrowRight") {
+    getRandomTrailer(); // 오른쪽 방향키가 눌리면 getRandomTrailer 실행
+  }
+};
+
+
 onMounted(() => {
   getRandomTrailer(); // 페이지 로드 시 첫 랜덤 예고편 가져오기
+  window.addEventListener("keydown", handleKeyDown); // keydown 이벤트 리스너 추가
+});
+// 컴포넌트가 언마운트될 때 이벤트 리스너 제거
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleKeyDown);
 });
 </script>
 
