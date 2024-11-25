@@ -10,6 +10,13 @@ class CustomRegisterSerializer(RegisterSerializer):
       allow_blank=True,
       max_length=255
     )
+
+    # profileimage 필드를 추가
+    profileimage = serializers.ImageField(
+        allow_null=True,  # Null 값 허용
+        required=False,   # 필수 값이 아니므로 False로 설정
+    )
+
     # 해당 필드도 저장시 함께 사용하도록 설정합니다. 
     def get_cleaned_data(self):
         return {
@@ -18,6 +25,8 @@ class CustomRegisterSerializer(RegisterSerializer):
             'password1': self.validated_data.get('password1', ''),
             # nickname 필드 추가
             'nickname': self.validated_data.get('nickname', ''),
+            # 프로필 이미지 추가
+            'profileimage': self.validated_data.get('profileimage', None),
         }
 
 from django.contrib.auth import get_user_model
@@ -38,7 +47,9 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
         if hasattr(UserModel, 'last_name'):
             extra_fields.append('last_name')
         if hasattr(UserModel, 'nickname'):
-            extra_fields.append('nickname')    
+            extra_fields.append('nickname')   
+        if hasattr(UserModel, 'profileimage'):  # profileimage 필드 추가
+            extra_fields.append('profileimage')
         model = UserModel
         fields = ('pk', *extra_fields)
         read_only_fields = ('email',)

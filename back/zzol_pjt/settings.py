@@ -26,7 +26,8 @@ environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 TMDB_API_KEY = env('TMDB_KEY')
 OPENAI_API_KEY = env('OPENAI_KEY')
 
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Application definition
