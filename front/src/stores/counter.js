@@ -5,32 +5,34 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import { useRouter } from "vue-router";
 
-export const useCounterStore = defineStore('counter', () => {
-  const articles = ref([])
-  const movies = ref([])
-  const movieDetail = ref([])
-  const randomDetail = ref([])
-  const popularMovies = ref([])
-  const latestMovies = ref([])
-  const ratingMovies = ref([])
-  const randomReviews = ref([])
-  const fearMovies = ref([])
-  const reviews = ref([])
-  const comments = ref([])
-  const articleComments = ref([])
-  const API_URL = 'http://127.0.0.1:8000'
-  const token = ref(null)
-  const profileImage = ref(""); // 프로필 이미지 상태 추가
-  const nickname = ref("");
-  const email = ref("");
-  const isLogin = computed(() => {
-    if (token.value === null) {
-      return false
-    } else {
-      return true
-    }
-  })
-  const router = useRouter()
+export const useCounterStore = defineStore(
+  "counter",
+  () => {
+    const articles = ref([]);
+    const movies = ref([]);
+    const movieDetail = ref([]);
+    const randomDetail = ref([]);
+    const popularMovies = ref([]);
+    const latestMovies = ref([]);
+    const ratingMovies = ref([]);
+    const randomReviews = ref([]);
+    const fearMovies = ref([]);
+    const reviews = ref([]);
+    const comments = ref([]);
+    const articleComments = ref([]);
+    const API_URL = "http://127.0.0.1:8000";
+    const token = ref(null);
+    const profileImage = ref(""); // 프로필 이미지 상태 추가
+    const nickname = ref("");
+    const email = ref("");
+    const isLogin = computed(() => {
+      if (token.value === null) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+    const router = useRouter();
 
     // 유저 정보 요청 후 프로필 사진 저장
     const fetchUserProfile = () => {
@@ -53,6 +55,50 @@ export const useCounterStore = defineStore('counter', () => {
         });
     };
 
+    // 영화 좋아요 추가
+    const likeMovie = (movieId) => {
+      axios
+        .post(
+          `${API_URL}/api/v1/movies/${movieId}/like/`,
+          {},
+          {
+            headers: {
+              Authorization: `Token ${token.value}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log("Movie liked:", response.data);
+          // 상태 업데이트 (영화 목록을 다시 가져오는 방법이나, 바로 반영)
+          getMovies(); // 영화 목록을 다시 가져와서 좋아요 상태 반영
+        })
+        .catch((err) => {
+          console.log("Error liking movie:", err);
+        });
+    };
+
+    // 영화 좋아요 취소
+    const unlikeMovie = (movieId) => {
+      axios
+        .delete(
+          `${API_URL}/api/v1/movies/${movieId}/unlike/`,
+          {},
+          {
+            headers: {
+              Authorization: `Token ${token.value}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log("Movie unliked:", response.data);
+          // 상태 업데이트 (영화 목록을 다시 가져오는 방법이나, 바로 반영)
+          getMovies(); // 영화 목록을 다시 가져와서 좋아요 상태 반영
+        })
+        .catch((err) => {
+          console.log("Error unliking movie:", err);
+        });
+    };
+
     // DRF로 전체 게시글 요청을 보내고 응답을 받아 articles에 저장하는 함수
     const getArticles = function () {
       axios({
@@ -70,7 +116,6 @@ export const useCounterStore = defineStore('counter', () => {
           console.log(err);
         });
     };
-
 
     // 리뷰에 대한 댓글 가져와서 comments에 저장하는 함수
     const getReviewComments = function (review_pk) {
@@ -149,34 +194,37 @@ export const useCounterStore = defineStore('counter', () => {
         });
     };
 
-
-  const getMovieReviews = async function (movie_pk) {
-      const response = await axios.get(`${API_URL}/api/v1/${movie_pk}/reviews/`, {
-        headers: {
-          Authorization: `Token ${token.value}`
+    const getMovieReviews = async function (movie_pk) {
+      const response = await axios.get(
+        `${API_URL}/api/v1/${movie_pk}/reviews/`,
+        {
+          headers: {
+            Authorization: `Token ${token.value}`,
+          },
         }
-      })
-      reviews.value = response.data
-      return response.data
-  }
+      );
+      reviews.value = response.data;
+      return response.data;
+    };
 
-  const getRandomMovieReviews = function (tmdb_id) {
-    axios.get(`${API_URL}/api/v1/random/${tmdb_id}/reviews/`, {
-      headers: {
-        Authorization: `Token ${token.value}`
-      }
-    })
-    .then((res) => {
-      console.log("이까지오나")
-      console.log(res.data)
-      randomReviews.value = res.data
-      console.log(randomReviews.value)
-    })
-    .catch((err) => {
-      console.log("아님여긴가")
-      console.log(err)
-    })
-  }
+    const getRandomMovieReviews = function (tmdb_id) {
+      axios
+        .get(`${API_URL}/api/v1/random/${tmdb_id}/reviews/`, {
+          headers: {
+            Authorization: `Token ${token.value}`,
+          },
+        })
+        .then((res) => {
+          console.log("이까지오나");
+          console.log(res.data);
+          randomReviews.value = res.data;
+          console.log(randomReviews.value);
+        })
+        .catch((err) => {
+          console.log("아님여긴가");
+          console.log(err);
+        });
+    };
 
     // 랜덤 영화
     const getRandomMovies = async () => {
@@ -204,52 +252,49 @@ export const useCounterStore = defineStore('counter', () => {
           password2,
           nickname,
         },
-      })
-    }
-      
+      });
+    };
 
-  const getMovieList = async (sortBy) => {
-    const response = await axios.get(`${API_URL}/api/v1/movielist/`, {
-      params: { sort: sortBy },
-      headers: {
-        Authorization: `Token ${token.value}`,
-      },
-      
-    })
-    switch(sortBy) {
-      case 'popularity':
-        popularMovies.value = response.data;
-        break;
-      case 'latest':
-        latestMovies.value = response.data;
-        break;
-      case 'rating':
-        ratingMovies.value = response.data;
-        break;
-      case 'fear':
-        fearMovies.value = response.data;
-        break;
-    }
-  }
+    const getMovieList = async (sortBy) => {
+      const response = await axios.get(`${API_URL}/api/v1/movielist/`, {
+        params: { sort: sortBy },
+        headers: {
+          Authorization: `Token ${token.value}`,
+        },
+      });
+      switch (sortBy) {
+        case "popularity":
+          popularMovies.value = response.data;
+          break;
+        case "latest":
+          latestMovies.value = response.data;
+          break;
+        case "rating":
+          ratingMovies.value = response.data;
+          break;
+        case "fear":
+          fearMovies.value = response.data;
+          break;
+      }
+    };
 
-  const getRandomDetail = async (movieId) => {
-    try {
-      const response = await axios.get(
-        `${API_URL}/api/v1/random/${movieId}/`,
-        {
-          headers: {
-            Authorization: `Token ${token.value}`
+    const getRandomDetail = async (movieId) => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/v1/random/${movieId}/`,
+          {
+            headers: {
+              Authorization: `Token ${token.value}`,
+            },
           }
-        }
-      )
-      randomDetail.value = response.data
-      return response.data
-    } catch (error) {
-      console.error('Error fetching movie:', error)
-      throw error
-    }
-  }
-
+        );
+        randomDetail.value = response.data;
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching movie:", error);
+        throw error;
+      }
+    };
 
     // 로그인 요청 액션
     const logIn = function (payload) {
@@ -310,10 +355,44 @@ export const useCounterStore = defineStore('counter', () => {
       return movie;
     };
 
-
-  return { articles, API_URL, reviews, comments, popularMovies, latestMovies, ratingMovies, fearMovies, randomDetail, randomReviews, articleComments, getArticleComments, getRandomMovieReviews, getRandomDetail, getRandomMovies, getMovieList, getReviewComments, getArticles, getMovieReviews, signUp, logIn, token, isLogin, logOut, movies, carts, getMovies, getMovieById, getMovieDetail, movieDetail, fetchUserProfile,
+    return {
+      articles,
+      API_URL,
+      reviews,
+      comments,
+      popularMovies,
+      latestMovies,
+      ratingMovies,
+      fearMovies,
+      randomDetail,
+      randomReviews,
+      articleComments,
+      getArticleComments,
+      getRandomMovieReviews,
+      getRandomDetail,
+      getRandomMovies,
+      getMovieList,
+      getReviewComments,
+      getArticles,
+      getMovieReviews,
+      signUp,
+      logIn,
+      token,
+      isLogin,
+      logOut,
+      movies,
+      carts,
+      getMovies,
+      getMovieById,
+      getMovieDetail,
+      movieDetail,
+      fetchUserProfile,
       profileImage,
       nickname,
-      email,  }
-}, { persist: true })
-
+      email,
+      likeMovie,
+      unlikeMovie,
+    };
+  },
+  { persist: true }
+);

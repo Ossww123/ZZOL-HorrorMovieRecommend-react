@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     nickname = models.CharField(max_length=100)
     profileimage = models.ImageField(upload_to='profile_images/', null=True, blank=True)
+    liked_movies = models.ManyToManyField('articles.Movie', related_name='liked_by_users', blank=True)
 
 from allauth.account.adapter import DefaultAccountAdapter
 class CustomAccountAdapter(DefaultAccountAdapter):

@@ -1,116 +1,134 @@
 <!--MovieDetailInfo.vue-->
 <template>
-  <div v-if="movie" class="container mx-auto p-6 bg-gray-900 text-white">
-    <!-- 영화 정보 콘텐츠 -->
-    <div class="flex flex-col items-center md:flex-row md:space-x-8 mb-8">
-      <img
-        :src="'https://image.tmdb.org/t/p/w500' + movie.poster_path"
-        alt="Poster"
-        class="w-48 h-auto rounded-lg shadow-xl mb-4 md:mb-0"
-      />
-      <div class="flex flex-col justify-center">
-        <h3 class="text-3xl font-bold text-red-600 mb-2">{{ movie.title }}</h3>
-        <p class="text-sm text-gray-400 mb-1">
-          개봉일: {{ movie.release_date }}
-        </p>
-        <p class="text-sm text-gray-400 mb-1">
-          러닝타임: {{ runtime.runtime }}분
-        </p>
-        <p class="text-sm text-gray-400 mb-1">
-          TMDB 평점: {{ movie.tmdb_vote_sum }}
-        </p>
+  <div v-if="movie" class="container mx-auto p-6 text-white">
+    <!-- 상단 영화 정보 -->
+    <div
+      class="relative flex flex-col md:flex-row items-center border-b border-gray-700 pb-6 mb-6 rounded-lg"
+      :style="{
+        backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9)), url(https://image.tmdb.org/t/p/w1280${movie.backdrop_path})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }"
+    >
+      <!-- 어두운 배경 -->
+      <div class="absolute inset-0 bg-black opacity-30 rounded-lg"></div>
+
+      <!-- 포스터 -->
+      <div class="w-full md:w-1/4 relative z-10">
+        <img
+          :src="'https://image.tmdb.org/t/p/w500' + movie.poster_path"
+          alt="Poster"
+          class="w-full h-auto rounded-lg shadow-xl"
+        />
+      </div>
+
+      <!-- 제목 및 정보 -->
+      <div
+        class="w-full md:w-3/4 md:pl-6 flex flex-col justify-between relative z-10"
+      >
+        <div>
+          <h3 class="text-4xl font-bold text-white mb-4">{{ movie.title }}</h3>
+          <p class="text-sm text-gray-300 mb-1">
+            개봉일: {{ movie.release_date }}
+          </p>
+          <p class="text-sm text-gray-300 mb-1">
+            러닝타임: {{ runtime.runtime }}분
+          </p>
+          <p class="text-sm text-gray-300 mb-1">
+            TMDB 평점: {{ movie.tmdb_vote_sum }}
+          </p>
+        </div>
+        <!-- 좋아요 버튼 -->
+        <div class="mt-6">
+          <button
+            @click="toggleLike"
+            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+          >
+            {{ isLiked ? "좋아요 취소" : "좋아요" }}
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- 장르 섹션 -->
-    <h3 class="text-xl font-semibold text-red-600 mb-4">장르</h3>
-    <div class="bg-gray-800 p-4 rounded-lg shadow-sm mb-8">
-      <p v-for="genre in movie.genres" :key="genre.id" class="text-gray-300">
-        {{ genre.name }}
-      </p>
-    </div>
+    <!-- 줄거리 -->
+    <h3 class="text-2xl font-semibold text-red-500 mb-4">줄거리</h3>
+    <p class="text-gray-300 mb-8">{{ movie.overview }}</p>
 
-    <!-- 줄거리 섹션 -->
-    <h3 class="text-xl font-semibold text-red-600 mb-4">줄거리</h3>
-    <p class="text-gray-300 mb-6">{{ movie.overview }}</p>
-
-    <!-- 키워드 섹션 -->
-    <h3 class="text-xl font-semibold text-red-600 mb-4">키워드</h3>
-    <div class="bg-gray-800 p-4 rounded-lg shadow-sm mb-8">
-      <p
+    <!-- 키워드 -->
+    <h3 class="text-2xl font-semibold text-red-500 mb-4">키워드</h3>
+    <div class="flex flex-wrap gap-2 mb-8">
+      <span
         v-for="keyword in keywords.keywords"
         :key="keyword.id"
-        class="text-gray-300"
+        class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm"
       >
         {{ keyword.name }}
-      </p>
+      </span>
     </div>
 
-    <!-- 공식 예고편 섹션 -->
-    <h3 class="text-xl font-semibold text-red-600 mb-4">공식 예고편</h3>
-    <p class="text-gray-300 mb-6">예고편을 보려면 아래 버튼을 클릭하세요.</p>
-
-    <!-- 예고편 보기 버튼 -->
-    <button
-      @click="openTrailerModal"
-      class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200"
-    >
-      예고편 보기
-    </button>
-
-    <!-- 사용자 평점 및 기타 정보 -->
-    <div class="mt-8 space-y-4">
-      <p class="text-gray-300">
-        사용자 평점: {{ movie.user_vote_sum }} ({{ movie.user_vote_cnt }})
-      </p>
-      <p class="text-gray-300">공포지수: {{ movie.fear_index }}</p>
-    </div>
-    
-    <!-- 감독 정보 -->
-    <h3>감독</h3>
-    <div class="director-section">
-      <div v-for="directorId in movie.movie_director" :key="directorId" class="director-card">
-        <div v-if="directors[directorId]">
-          <img 
-            v-if="directors[directorId].profile_path" 
-            :src="`https://image.tmdb.org/t/p/w200${directors[directorId].profile_path}`" 
-            :alt="directors[directorId].name"
+    <!-- 감독 및 배우 섹션 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- 감독 -->
+      <div>
+        <h3 class="text-2xl font-semibold text-red-500 mb-4">감독</h3>
+        <div class="flex gap-4 items-center">
+          <div
+            v-for="directorId in movie.movie_director"
+            :key="directorId"
+            class="text-center"
           >
-          <div class="director-info">
-            <p>{{ directors[directorId].name }}</p>
-            <p>{{ directors[directorId].original_name }}</p>
+            <div v-if="directors[directorId]">
+              <img
+                v-if="directors[directorId].profile_path"
+                :src="`https://image.tmdb.org/t/p/w200${directors[directorId].profile_path}`"
+                :alt="directors[directorId].name"
+                class="w-20 h-20 rounded-full object-cover"
+              />
+              <p class="text-gray-300 mt-2">{{ directors[directorId].name }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 배우 -->
+      <div>
+        <h3 class="text-2xl font-semibold text-red-500 mb-4">출연 배우</h3>
+        <div class="grid grid-cols-3 gap-4">
+          <div
+            v-for="actorId in movie.movie_actor"
+            :key="actorId"
+            class="text-center"
+          >
+            <div v-if="actors[actorId]">
+              <img
+                v-if="actors[actorId].profile_path"
+                :src="`https://image.tmdb.org/t/p/w200${actors[actorId].profile_path}`"
+                :alt="actors[actorId].name"
+                class="w-20 h-20 rounded-full object-cover"
+              />
+              <p class="text-gray-300 mt-2">{{ actors[actorId].name }}</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 배우 정보 -->
-    <h3>출연 배우</h3>
-    <div class="actor-section">
-      <div v-for="actorId in movie.movie_actor" :key="actorId" class="actor-card">
-        <div v-if="actors[actorId]">
-        <img
-          v-if="actors[actorId].profile_path" 
-          :src="`https://image.tmdb.org/t/p/w200${actors[actorId].profile_path}`" 
-          :alt="actors[actorId].name"
-        >
-        <div class="actor-info">
-          <p>{{ actors[actorId].name }}</p>
-          <p>{{ actors[actorId].original_name }}</p>
-        </div>
-      </div>
+    <!-- 예고편 -->
+    <div class="mt-8">
+      <h3 class="text-2xl font-semibold text-red-500 mb-4">공식 예고편</h3>
+      <button
+        @click="openTrailerModal"
+        class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200"
+      >
+        예고편 보기
+      </button>
     </div>
+
+    <!-- 리뷰 -->
+    <MovieDetailReview :movie_pk="movieId" @reviewChange="updateMovieData" />
   </div>
 
-    <YoutubeTrailerModal
-      v-if="isModalVisible"
-      :showModal="isModalVisible"
-      :movie="movie"
-      @close="closeTrailerModal"
-    />
-  </div>
-
-  <!-- 로딩 상태 및 영화가 없을 때 메시지 -->
+  <!-- 로딩 메시지 -->
   <div
     v-else-if="isLoading"
     class="flex justify-center items-center h-screen bg-gray-900"
@@ -121,7 +139,12 @@
     <p class="text-lg text-gray-400">영화를 찾을 수 없습니다.</p>
   </div>
 
-  <MovieDetailReview :movie_pk="movieId" @reviewChange="updateMovieData" />
+  <YoutubeTrailerModal
+    v-if="isModalVisible"
+    :showModal="isModalVisible"
+    :movie="movie"
+    @close="closeTrailerModal"
+  />
 </template>
 
 <style scoped>
@@ -170,6 +193,7 @@ import { useCounterStore } from "@/stores/counter";
 import { onMounted, computed, ref } from "vue";
 import YoutubeTrailerModal from "./YoutubeTrailerModal.vue";
 import MovieDetailReview from "@/components/MovieDetailReview.vue";
+import { onBeforeRouteUpdate } from "vue-router";
 
 const store = useCounterStore();
 const route = useRoute();
@@ -177,12 +201,13 @@ const movieId = route.params.movie_id;
 const apiKey = import.meta.env.VITE_TMDB;
 const movie = ref(null);
 
-const isLoading = ref(true)
-const isModalVisible = ref(false) // 모달의 열림 상태
-const runtime = ref([])
-const keywords = ref([])
-const directors = ref({})
-const actors = ref({})
+const isLoading = ref(true);
+const isModalVisible = ref(false); // 모달의 열림 상태
+const runtime = ref([]);
+const keywords = ref([]);
+const directors = ref({});
+const actors = ref({});
+const isLiked = ref(false); // 좋아요 상태
 
 import axios from "axios";
 
@@ -215,25 +240,77 @@ const getKeyword = async (movieId) => {
   console.log(keywords.value);
 };
 
-const getDirector = async (directorId) => {
-    const response = await axios.get(`${store.API_URL}/api/v1/directors/${directorId}/`, {
-      headers: {
-        Authorization: `Token ${store.token}`
+// 좋아요 상태를 체크하는 함수
+const checkIfLiked = async () => {
+  try {
+    const response = await axios.get(
+      `${store.API_URL}/api/v1/movies/${movieId}/like/`,
+      {
+        headers: {
+          Authorization: `Token ${store.token}`,
+        },
       }
-    })
-    directors.value[directorId] = response.data
-}
+    );
+    isLiked.value = response.data.is_liked; // 서버에서 좋아요 여부를 받아와 상태 업데이트
+  } catch (error) {
+    console.error("좋아요 상태 확인 실패", error);
+  }
+};
+
+// 좋아요/좋아요 취소 함수
+const toggleLike = async () => {
+  try {
+    if (isLiked.value) {
+      // 좋아요 취소
+      await axios.delete(`${store.API_URL}/api/v1/movies/${movieId}/unlike/`, {
+        headers: {
+          Authorization: `Token ${store.token}`,
+        },
+      });
+      isLiked.value = false;
+    } else {
+      // 좋아요 추가
+      await axios.post(
+        `${store.API_URL}/api/v1/movies/${movieId}/like/`,
+        {},
+        {
+          headers: {
+            Authorization: `Token ${store.token}`,
+          },
+        }
+      );
+      isLiked.value = true;
+    }
+  } catch (error) {
+    console.error("좋아요 상태 변경 실패", error);
+  }
+};
+
+const getDirector = async (directorId) => {
+  const response = await axios.get(
+    `${store.API_URL}/api/v1/directors/${directorId}/`,
+    {
+      headers: {
+        Authorization: `Token ${store.token}`,
+      },
+    }
+  );
+  directors.value[directorId] = response.data;
+};
 
 const getActor = async (actorIds) => {
   for (const actorId of actorIds) {
-    const response = await axios.get(`${store.API_URL}/api/v1/actors/${actorId}/`, {
-      headers: {
-        Authorization: `Token ${store.token}`
+    const response = await axios.get(
+      `${store.API_URL}/api/v1/actors/${actorId}/`,
+      {
+        headers: {
+          Authorization: `Token ${store.token}`,
+        },
       }
-    })
-    actors.value[actorId] = response.data
+    );
+    actors.value[actorId] = response.data;
   }
-}
+};
 
 const genreList = [
   { id: 28, name: "액션" },
@@ -272,31 +349,54 @@ onMounted(async () => {
   await getMovieRuntime(movie.value.tmdb_Id);
 
   // const movie = store.movies.find((movie)) movie.id == movieId)
-  
+
   await getKeyword(movie.value.tmdb_Id);
   // keywords.value = movieKeywords; // 영화의 러닝타임을 상태에 저장
-  
-  getDirector(movie.value.movie_director)
-  console.log('감독')
-  console.log(movie.value.movie_director)
-  getActor(movie.value.movie_actor)
-  console.log('배우')
-  console.log(movie.value.movie_actor)
+
+  getDirector(movie.value.movie_director);
+  console.log("감독");
+  console.log(movie.value.movie_director);
+  getActor(movie.value.movie_actor);
+  console.log("배우");
+  console.log(movie.value.movie_actor);
 
   // movies가 비어있지 않으면 로딩 상태 false로 설정
   const interval = setInterval(() => {
     if (store.movies.length > 0) {
       isLoading.value = false;
+      checkIfLiked();
       clearInterval(interval);
     }
   }, 100);
+  isLoading.value = true; // 데이터 로딩 시작
+  await loadMovieData();
+  isLoading.value = false; // 데이터 로딩 완료
 });
 
 const updateMovieData = async () => {
-    await store.getMovieReviews(movieId)  // 리뷰 목록 갱신
-    await store.getMovieDetail(movieId)    // 영화 정보 갱신
-    movie.value = store.movieDetail        // 화면 갱신
-}
+  await store.getMovieReviews(movieId); // 리뷰 목록 갱신
+  await store.getMovieDetail(movieId); // 영화 정보 갱신
+  movie.value = store.movieDetail; // 화면 갱신
+};
+
+onBeforeRouteUpdate(async (to, from, next) => {
+  // 페이지가 변경될 때마다 영화 데이터를 새로 로딩
+  isLoading.value = true; // 데이터 로딩 시작
+  await loadMovieData();
+  isLoading.value = false; // 데이터 로딩 완료
+  next(); // 경로 업데이트가 끝난 후 다음 동작 진행
+});
+
+const loadMovieData = async () => {
+  // movie 데이터 로드 및 기타 관련 작업
+  await store.getMovieDetail(movieId); // 비동기 로딩 완료 후
+  movie.value = store.movieDetail;
+  await getMovieRuntime(movie.value.tmdb_Id);
+  await getKeyword(movie.value.tmdb_Id);
+  await getDirector(movie.value.movie_director);
+  await getActor(movie.value.movie_actor);
+  checkIfLiked();
+};
 
 // 예고편 모달 열기
 const openTrailerModal = () => {

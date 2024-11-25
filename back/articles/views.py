@@ -617,3 +617,63 @@ def recommends(request, article_pk):
         'is_recommended': is_recommended,
         'recommend_count': article.recommend_users.count()
     })
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])  # 인증된 유저만 접근 가능
+def like_movie(request, movie_id):
+    if request.method == 'GET':
+        try:
+            movie = Movie.objects.get(id=movie_id)
+        except Movie.DoesNotExist:
+            return Response({"detail": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user  # 현재 로그인한 유저
+
+        # 유저가 해당 영화를 좋아요 목록에 포함하고 있는지 확인
+        is_liked = user.liked_movies.filter(id=movie.id).exists()
+        
+        return Response({"is_liked": is_liked}, status=status.HTTP_200_OK)
+    else:
+        try:
+            movie = Movie.objects.get(id=movie_id)
+        except Movie.DoesNotExist:
+            return Response({"detail": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user  # 현재 로그인한 유저
+
+        # 유저가 이미 해당 영화를 좋아요 목록에 추가했다면, 추가하지 않음
+        if user.liked_movies.filter(id=movie.id).exists():
+            return Response({"detail": "Movie already liked"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 좋아요 추가
+        user.liked_movies.add(movie)
+        return Response({"status": "movie liked"}, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])  # 인증된 유저만 접근 가능
+def unlike_movie(request, movie_id):
+    try:
+        movie = Movie.objects.get(id=movie_id)
+    except Movie.DoesNotExist:
+        return Response({"detail": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    user = request.user  # 현재 로그인한 유저
+
+    # 유저가 해당 영화를 좋아요 목록에 추가한 적이 없다면
+    if not user.liked_movies.filter(id=movie.id).exists():
+        return Response({"detail": "Movie not liked"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # 좋아요 취소
+    user.liked_movies.remove(movie)
+    return Response({"status": "movie unliked"}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # 인증된 유저만 접근 가능
+def get_liked_movies(request):
+    user = request.user  # 현재 로그인한 유저
+    liked_movies = user.liked_movies.all()  # 유저가 좋아요한 영화들 가져오기
+    
+    # 영화 목록을 반환 (제목과 ID만 반환)
+    movie_data = [{"id": movie.id, "title": movie.title, "image": movie.poster_path} for movie in liked_movies]
+    return Response(movie_data)
