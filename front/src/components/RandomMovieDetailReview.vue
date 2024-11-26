@@ -13,8 +13,6 @@
     />
     <h1>리뷰 작성</h1>
     <form @submit.prevent="createReview(tmdb_id)">
-      
-
       <!-- 평점 -->
       <div>
         <label for="rate">평점</label>
@@ -55,39 +53,39 @@
     </form>
   </div>
 </template>
-  
-  <script setup>
-    import RandomMovieDetailReviewItem from '@/components/RandomMovieDetailReviewItem.vue'
-    import { ref, computed } from 'vue'
-    import { useCounterStore } from '@/stores/counter'
-    import axios from 'axios'
-    import { useRouter } from 'vue-router'
-    
-    const store = useCounterStore()
-    const title = ref(null)
-    const content = ref(null)
-    const rate = ref(null)
-    const fear_score = ref(null)
-    const router = useRouter()
-    const reviews = computed(() => store.reviews || []);
-    const emit = defineEmits(['reviewChange'])
-  
-    const props = defineProps({
-    tmdb_id: String
-})
-    // 평점 및 공포지수 이미지 결정 함수
+
+<script setup>
+import RandomMovieDetailReviewItem from "@/components/RandomMovieDetailReviewItem.vue";
+import { ref, computed } from "vue";
+import { useCounterStore } from "@/stores/counter";
+import axios from "axios";
+import { useRouter } from "vue-router";
+
+const store = useCounterStore();
+const title = ref(null);
+const content = ref(null);
+const rate = ref(null);
+const fear_score = ref(null);
+const router = useRouter();
+const reviews = computed(() => store.reviews || []);
+const emit = defineEmits(["reviewChange"]);
+
+const props = defineProps({
+  tmdb_id: String,
+});
+// 평점 및 공포지수 이미지 결정 함수
 const getStarImage = (score, index) => {
   if (index <= score) {
-    return '/images/star_full.png'; // 꽉 찬 별
+    return "/images/star_full.png"; // 꽉 찬 별
   }
-  return '/images/star_empty.png'; // 빈 별
+  return "/images/star_empty.png"; // 빈 별
 };
 
 const getGhostImage = (score, index) => {
   if (index <= score) {
-    return '/images/ghost_full.png'; // 꽉 찬 별
+    return "/images/ghost_full.png"; // 꽉 찬 별
   }
-  return '/images/ghost_empty.png'; // 빈 별
+  return "/images/ghost_empty.png"; // 빈 별
 };
 
 // 평점 값 설정
@@ -100,8 +98,6 @@ const setFearScore = (value) => {
   fear_score.value = value;
 };
 
-    
-  
 const createReview = async function (tmdb_id) {
   try {
     // 리뷰 생성 요청
@@ -141,16 +137,16 @@ const createReview = async function (tmdb_id) {
     }
   }
 };
-      
-      const onReviewDeleted = async () => {
-        await store.getRandomMovieReviews(props.tmdb_id)
-        await store.getRandomMovieDetail(props.tmdb_id)
-        emit('reviewChange')
-      }
-  </script>
-  
-  <style scoped>
-  /* 전체 폼 컨테이너 */
+
+const onReviewDeleted = async () => {
+  await store.getRandomMovieReviews(props.tmdb_id);
+  await store.getRandomMovieDetail(props.tmdb_id);
+  emit("reviewChange");
+};
+</script>
+
+<style scoped>
+/* 전체 폼 컨테이너 */
 form {
   width: 100%; /* 전체 너비 차지 */
   background-color: rgba(20, 20, 20, 0.9);
