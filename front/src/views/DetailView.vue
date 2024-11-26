@@ -3,6 +3,7 @@
     <h1>Detail</h1>
     <div v-if="article">
       <p>게시글 번호 : {{ article.id }}</p>
+      <p>닉네임 : {{ article.user.nickname }}</p>
       <p>제목 : {{ article.title }}</p>
       <p>내용 : {{ article.content }}</p>
       <p>작성일 : {{ article.created_at }}</p>
