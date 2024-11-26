@@ -1,3 +1,4 @@
+<!-- ArticleListItem.vue -->
 <template>
   <div class="article-item">
     <div class="article-header">
@@ -6,22 +7,22 @@
         추천 {{ article.recommend_users?.length || 0 }}
       </span>
     </div>
-    
+
     <div class="article-content-wrapper">
       <p class="article-title">{{ article.title }}</p>
       <p class="article-content">{{ truncateContent(article.content) }}</p>
     </div>
-    
+
     <div class="article-footer">
       <div class="article-info">
-        <span class="author">작성자: {{ article.user.nickname }}</span> <!-- nickname으로 수정 -->
+        <span class="author">작성자: {{ article.user.nickname }}</span>
         <span class="date">{{ formatDate(article.created_at) }}</span>
       </div>
-      <RouterLink 
+      <RouterLink
         :to="{ name: 'DetailView', params: { id: article.id } }"
         class="detail-link"
       >
-        Detail
+        상세 보기
       </RouterLink>
     </div>
     <hr />
@@ -36,12 +37,12 @@ defineProps({
 });
 
 const truncateContent = (content) => {
-  return content.length > 100 ? content.slice(0, 100) + '...' : content;
+  return content.length > 100 ? content.slice(0, 100) + "..." : content;
 };
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('ko-KR');
+  return date.toLocaleDateString("ko-KR");
 };
 </script>
 
@@ -52,6 +53,13 @@ const formatDate = (dateString) => {
   margin-bottom: 20px;
   border-radius: 8px;
   color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 카드 그림자 */
+  transition: transform 0.3s, box-shadow 0.3s; /* 호버 효과 */
+}
+
+.article-item:hover {
+  transform: scale(1.03); /* 호버 시 약간 확대 */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* 호버 시 그림자 강조 */
 }
 
 .article-header {

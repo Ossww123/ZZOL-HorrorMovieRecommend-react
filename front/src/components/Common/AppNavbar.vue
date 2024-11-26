@@ -2,7 +2,7 @@
   <nav class="bg-black text-white p-4 flex items-center">
     <!-- 로고 이미지 추가 -->
     <RouterLink :to="{ name: 'HomeView' }">
-      <img src="@/assets/logo.png" alt="Logo" class="h-8 mr-4" />
+      <img src="@/assets/logo.png" alt="Logo" class="h-16 mr-4" />
     </RouterLink>
 
     <!-- 네비게이션 링크들 왼쪽 정렬 -->
@@ -14,7 +14,6 @@
         >Articles</RouterLink
       >
       <RouterLink to="/movies" class="hover:text-gray-400">Movies</RouterLink>
-
 
       <!--
       <RouterLink to="/review-search" class="hover:text-gray-400"
@@ -97,7 +96,7 @@ import { debounce } from "lodash";
 // 스토어와 라우터 훅을 설정
 const store = useCounterStore();
 const router = useRouter(); // useRouter 훅으로 라우터 객체를 가져옴
-const route = useRoute()
+const route = useRoute();
 const searchQuery = ref(""); // 검색어 상태 변수
 
 // 검색 함수 (디바운스 적용)
@@ -118,8 +117,6 @@ onMounted(() => {
     searchQuery.value = "";
   }
 });
-
-
 
 // 로그아웃 함수
 const logOut = function () {
