@@ -9,7 +9,7 @@
       <label
         for="userInput"
         class="block text-lg font-semibold text-gray-300 mb-2"
-        >원하는 영화 설명:</label
+        >안녕하세요! 오늘은 어떤 영화를 찾으시나요?</label
       >
       <textarea
         id="userInput"
