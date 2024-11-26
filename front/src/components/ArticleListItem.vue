@@ -1,15 +1,29 @@
 <template>
   <div class="article-item">
-    <h5>{{ article.id }}</h5>
-    <p class="article-title">{{ article.title }}</p>
-    <p class="article-content">{{ article.content }}</p>
-    <p><strong>작성자:</strong> {{ article.user }}</p>
-    <RouterLink
-      :to="{ name: 'DetailView', params: { id: article.id } }"
-      class="detail-link"
-    >
-      Detail
-    </RouterLink>
+    <div class="article-header">
+      <h5>#{{ article.id }}</h5>
+      <span class="recommend-count">
+        추천 {{ article.recommend_users?.length || 0 }}
+      </span>
+    </div>
+    
+    <div class="article-content-wrapper">
+      <p class="article-title">{{ article.title }}</p>
+      <p class="article-content">{{ truncateContent(article.content) }}</p>
+    </div>
+    
+    <div class="article-footer">
+      <div class="article-info">
+        <span class="author">작성자: {{ article.user }}</span>
+        <span class="date">{{ formatDate(article.created_at) }}</span>
+      </div>
+      <RouterLink 
+        :to="{ name: 'DetailView', params: { id: article.id } }"
+        class="detail-link"
+      >
+        Detail
+      </RouterLink>
+    </div>
     <hr />
   </div>
 </template>
@@ -20,6 +34,15 @@ import { RouterLink } from "vue-router";
 defineProps({
   article: Object,
 });
+
+const truncateContent = (content) => {
+  return content.length > 100 ? content.slice(0, 100) + '...' : content;
+};
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('ko-KR');
+};
 </script>
 
 <style scoped>
@@ -29,6 +52,22 @@ defineProps({
   margin-bottom: 20px;
   border-radius: 8px;
   color: white;
+}
+
+.article-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.recommend-count {
+  color: #e53e3e;
+  font-weight: bold;
+}
+
+.article-content-wrapper {
+  margin-bottom: 20px;
 }
 
 .article-title {
@@ -42,6 +81,19 @@ defineProps({
   font-size: 1rem;
   color: #cbd5e0;
   margin-bottom: 10px;
+}
+
+.article-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.article-info {
+  display: flex;
+  gap: 20px;
+  color: #a0aec0;
 }
 
 .detail-link {
@@ -60,7 +112,7 @@ defineProps({
 
 hr {
   border: 1px solid #2d3748;
-  margin-top: 20px;
+  margin: 0;
 }
 
 @media (max-width: 768px) {
@@ -74,6 +126,16 @@ hr {
 
   .article-content {
     font-size: 0.875rem;
+  }
+
+  .article-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .article-info {
+    flex-direction: column;
+    gap: 5px;
   }
 }
 </style>

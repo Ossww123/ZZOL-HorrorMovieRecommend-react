@@ -67,9 +67,9 @@
   
     const emit = defineEmits(['reviewChange'])
   
-    defineProps({
-        tmdb_id: String
-    })
+    const props = defineProps({
+    tmdb_id: String
+})
   
     
   
@@ -102,8 +102,8 @@
       }
       
       const onReviewDeleted = async () => {
-        await store.getRandomMovieReviews(tmdb_id)
-        await store.getRandomMovieDetail(tmdb_id)
+        await store.getRandomMovieReviews(props.tmdb_id)
+        await store.getRandomMovieDetail(props.tmdb_id)
         emit('reviewChange')
       }
   </script>

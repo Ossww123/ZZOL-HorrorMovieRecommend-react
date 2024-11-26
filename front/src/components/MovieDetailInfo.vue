@@ -312,6 +312,11 @@ const getActor = async (actorIds) => {
   }
 };
 
+const isKorean = (text) => {
+  const koreanRegex = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+  return koreanRegex.test(text);
+};
+
 const genreList = [
   { id: 28, name: "액션" },
   { id: 12, name: "모험" },
