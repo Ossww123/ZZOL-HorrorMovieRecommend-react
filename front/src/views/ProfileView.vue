@@ -24,14 +24,14 @@
         <li
           v-for="movie in likedMovies"
           :key="movie.id"
-          class="movie-item mb-4"
+          class="movie-card mb-4"
         >
           <img
             :src="'https://image.tmdb.org/t/p/w500' + movie.image"
             alt="Movie Image"
             class="w-24 h-32 object-cover rounded-md mb-2"
           />
-          <p class="text-center">{{ movie.title }}</p>
+          <p @click="goDetail(movie)" class="text-center">{{ movie.title }}</p>
         </li>
       </ul>
     </div>
@@ -47,6 +47,9 @@ import { ref, computed, onMounted } from "vue";
 import { useCounterStore } from "@/stores/counter"; // store 가져오기
 import defaultProfileImage from "@/assets/default-profile.png";
 import axios from "axios";
+import { useRouter } from "vue-router";
+
+const router = useRouter()
 
 // store에서 필요한 데이터 가져오기
 const store = useCounterStore();
@@ -79,9 +82,15 @@ const fetchLikedMovies = async () => {
       }
     );
     likedMovies.value = response.data; // 받아온 영화 목록을 상태에 저장
+    console.log(likedMovies.value)
   } catch (error) {
     console.error("좋아요한 영화 목록 가져오기 실패", error);
   }
+};
+
+
+const goDetail = (movie) => {
+  router.push(`/${movie.id}`);
 };
 </script>
 
@@ -155,6 +164,41 @@ const fetchLikedMovies = async () => {
   height: auto;
   object-fit: cover;
 }
+
+.movie-card img {
+  width: 100%;  /* 이미지 너비를 카드에 맞춤 */
+  height: 150px;  /* 이미지 높이 고정 */
+  object-fit: cover;  /* 이미지 비율 유지 */
+}
+
+.movie-card {
+  width: 100px;  /* 카드 너비 축소 */
+  margin: 0 auto;  /* 중앙 정렬 */
+  border-radius: 8px;  /* 모서리 둥글기 감소 */
+  overflow: hidden;
+  background-color: #2d3748;
+  color: rgb(255, 255, 255);
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* 내용 중앙 정렬 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+  cursor: pointer;  /* 클릭 가능함을 표시 */
+}
+
+.movie-card p {
+  padding: 8px;
+  font-size: 0.875rem;  /* 글자 크기 축소 */
+  text-align: center;
+  word-break: break-word;  /* 긴 제목 처리 */
+  max-width: 100%;  /* 텍스트 너비 제한 */
+}
+
+.movie-card:hover {
+  transform: translateY(-5px); /* 호버 시 살짝 위로 떠오르는 효과 */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); /* 강조된 그림자 */
+}
+
 
 @media (max-width: 768px) {
   .movie-item {

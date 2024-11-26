@@ -690,5 +690,5 @@ def get_liked_movies(request):
     liked_movies = user.liked_movies.all()  # 유저가 좋아요한 영화들 가져오기
     
     # 영화 목록을 반환 (제목과 ID만 반환)
-    movie_data = [{"id": movie.id, "title": movie.title, "image": movie.poster_path} for movie in liked_movies]
+    movie_data = [{"id": movie.id, "title": movie.title, "image": movie.poster_path, "tmdb_id": movie.tmdb_Id } for movie in liked_movies]
     return Response(movie_data)
