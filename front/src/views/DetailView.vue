@@ -1,29 +1,55 @@
 <template>
-  <div class="max-w-4xl mx-auto p-4 bg-gray-900 text-white rounded-lg shadow-md">
-    <h1 class="text-3xl font-semibold text-red-500 mb-6">게시글 상세</h1>
-    <div v-if="article">
-      <!-- 게시글 상세 정보 -->
-      <div class="bg-gray-800 p-6 rounded-lg mb-6">
-        <p class="text-sm text-gray-400">게시글 번호: <span class="text-white">{{ article.id }}</span></p>
-        <p class="text-lg font-bold text-white mt-2">제목: {{ article.title }}</p>
-        <p class="text-gray-300 mt-2">닉네임: <span class="text-red-400">{{ article.user.nickname }}</span></p>
-        <p class="text-gray-300 mt-2">작성일: {{ article.created_at }}</p>
-        <p class="text-gray-300 mt-2">수정일: {{ article.updated_at }}</p>
-        <p class="text-gray-300 mt-4">{{ article.content }}</p>
-      </div>
+  <div class="article-detail-container">
+    <!-- Article Header -->
+    <header class="article-header">
+      <h1 class="article-title">게시글 상세</h1>
+    </header>
 
-      <!-- 추천 버튼 -->
-      <div class="flex items-center gap-4 mb-6">
-        <button 
-          @click="Recommend(article.id)" 
-          class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded-lg focus:outline-none"
-        >
-          {{ isRecommended ? '추천' : '추천' }} ({{ recommendCount }})
+    <!-- Article Content -->
+    <div v-if="article" class="article-content-wrapper">
+      <section class="article-metadata">
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="metadata-label">제목:</span>
+            <span class="metadata-value title">{{ article.title }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">작성자:</span>
+            <span class="metadata-value author">{{
+              article.user.nickname
+            }}</span>
+          </div>
+          <div class="metadata-item metadata-dates">
+            <span class="metadata-label date-label">작성일:</span>
+            <span class="metadata-value date">{{
+              formatDate(article.created_at)
+            }}</span>
+          </div>
+          <div class="metadata-item metadata-dates">
+            <span class="metadata-label date-label">수정일:</span>
+            <span class="metadata-value date">{{
+              formatDate(article.updated_at)
+            }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Article Body -->
+      <article class="article-body">
+        <p class="article-text">{{ article.content }}</p>
+      </article>
+
+      <!-- Recommendation Section -->
+      <section class="recommendation-section">
+        <button @click="Recommend(article.id)" class="recommend-button">
+          {{ isRecommended ? "추천 취소" : "추천" }} ({{ recommendCount }})
         </button>
-      </div>
+      </section>
 
-      <!-- 댓글 섹션 -->
-      <ArticleCommentList :article="article" />
+      <!-- Comments Section -->
+      <section class="comments-section">
+        <ArticleCommentList :article="article" />
+      </section>
     </div>
   </div>
 </template>
@@ -41,6 +67,12 @@ const article = ref(null)
 const isRecommended = ref(false)
 const recommendCount = ref(0)
 
+// 날짜 포맷팅 함수
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  return dateString.split("T")[0];
+};
+
 // 게시글 조회
 onMounted(() => {
   axios({
@@ -48,8 +80,8 @@ onMounted(() => {
     url: `${store.API_URL}/api/v1/articles/${route.params.id}/`
   })
     .then((res) => {
-      article.value = res.data
-      checkRecommendStatus()
+      article.value = res.data;
+      checkRecommendStatus();
     })
     .catch((err) => {
       console.log(err)
@@ -63,18 +95,18 @@ const Recommend = async function(articleId) {
       method: 'post',
       url: `${store.API_URL}/api/v1/articles/${articleId}/recommends/`,
       headers: {
-        Authorization: `Token ${store.token}`
-      }
-    })
-    isRecommended.value = !isRecommended.value
-    recommendCount.value = response.data.recommend_count
+        Authorization: `Token ${store.token}`,
+      },
+    });
+    isRecommended.value = !isRecommended.value;
+    recommendCount.value = response.data.recommend_count;
 
-    // 추천 상태 변경 후 게시글 정보 업데이트
+    // 게시글 정보 업데이트
     const articleResponse = await axios({
-      method: 'get',
-      url: `${store.API_URL}/api/v1/articles/${articleId}/`
-    })
-    article.value = articleResponse.data
+      method: "get",
+      url: `${store.API_URL}/api/v1/articles/${articleId}/`,
+    });
+    article.value = articleResponse.data;
   } catch (err) {
     console.log(err)
   }
@@ -90,115 +122,80 @@ const checkRecommendStatus = () => {
 </script>
 
 <style scoped>
-/* 게시글 페이지 스타일링 */
-.bg-gray-900 {
-  background-color: #1a202c; /* 어두운 배경 */
+.article-detail-container {
+  @apply max-w-3xl mx-auto p-6 bg-gray-800 text-white rounded-lg shadow-lg;
 }
 
-.text-white {
-  color: #ffffff; /* 텍스트 색상 */
+.article-header {
+  @apply mb-8;
 }
 
-.text-red-500 {
-  color: #f56565; /* 빨간색 */
+.article-title {
+  @apply text-4xl font-semibold text-red-500;
 }
 
-.bg-gray-800 {
-  background-color: #2d3748; /* 회색 배경 */
+.article-metadata {
+  @apply bg-gray-700 p-6 rounded-lg mb-8;
 }
 
-.bg-red-500 {
-  background-color: #f56565; /* 빨간색 배경 */
+.metadata-grid {
+  @apply grid grid-cols-2 gap-4;
 }
 
-.bg-red-700 {
-  background-color: #c53030; /* 어두운 빨간색 */
+.metadata-item {
+  @apply flex items-center;
 }
 
-.hover\:bg-red-700:hover {
-  background-color: #c53030; /* hover 효과 */
+.metadata-label {
+  @apply font-bold mr-2 text-sm text-gray-300;
 }
 
-.text-gray-400 {
-  color: #cbd5e0; /* 밝은 회색 */
+.metadata-label.date-label {
+  @apply text-xs text-gray-400;
 }
 
-.text-gray-300 {
-  color: #e2e8f0; /* 더 밝은 회색 */
+.metadata-value {
+  @apply text-sm;
 }
 
-.text-lg {
-  font-size: 1.125rem; /* 큰 텍스트 */
+.metadata-value.title {
+  @apply text-xl font-bold text-white;
 }
 
-.text-sm {
-  font-size: 0.875rem; /* 작은 텍스트 */
+.metadata-value.author {
+  @apply text-red-400;
 }
 
-.text-center {
-  text-align: center; /* 중앙 정렬 */
+.metadata-value.date {
+  @apply text-xs text-gray-400;
 }
 
-.font-semibold {
-  font-weight: 600; /* 중간 두께의 글꼴 */
+.article-body {
+  @apply mb-8;
 }
 
-.rounded-lg {
-  border-radius: 0.5rem; /* 둥근 모서리 */
+.article-text {
+  @apply text-gray-300 leading-relaxed text-base;
 }
 
-.shadow-md {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 */
+.recommendation-section {
+  @apply flex justify-center mb-8;
 }
 
-.py-2 {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+.recommend-button {
+  @apply bg-red-500 hover:bg-red-700 text-white py-3 px-6 
+         rounded-lg focus:outline-none 
+         transform transition-all duration-300 
+         flex items-center gap-2;
 }
 
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
+@media (max-width: 768px) {
+  .metadata-grid {
+    @apply grid-cols-1;
+  }
 
-.mb-6 {
-  margin-bottom: 1.5rem;
-}
-
-.mt-4 {
-  margin-top: 1rem;
-}
-
-.mt-2 {
-  margin-top: 0.5rem;
-}
-
-.gap-4 {
-  gap: 1rem;
-}
-
-.gap-6 {
-  gap: 1.5rem;
-}
-
-.max-w-4xl {
-  max-width: 56rem; /* 최대 너비 */
-}
-
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.p-4 {
-  padding: 1rem; /* 패딩 */
-}
-
-.text-center {
-  text-align: center;
-}
-
-.focus\:outline-none:focus {
-  outline: none;
+  .article-title {
+    @apply text-3xl;
+  }
 }
 </style>

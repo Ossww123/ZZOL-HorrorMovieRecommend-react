@@ -234,8 +234,7 @@ def recommend_movies(request):
 
             # TMDB API를 사용해 영화 추천
             allowed_genres = [
-                "horror", "thriller", "action", "adventure", 
-                "animation", "comedy", "crime", "documentary", "drama"
+                "horror"
             ]
             movies = get_movies_by_keywords(keywords, allowed_genres)
             print(keywords, 'Movies:', movies)
@@ -256,21 +255,23 @@ def extract_keywords(user_input):
             model="gpt-4o-mini",
             messages=[
                 {
-                "role": "system",
-                "content": (
-                    "You are a helpful assistant that extracts movie-related keywords "
-                    "from user input in a specific format. Your task is to ensure the keywords "
-                    "align with those found in the TMDB database. Return the keywords in the following format:\n\n"
-                    "[\"keyword1\", \"keyword2\", \"keyword3\"]"
-                )
-            },
-            {
-                "role": "user",
-                "content": (
-                    f"Extract the three most relevant TMDB movie-related keywords from this input: \"{user_input}\". "
-                    "Return the keywords as a Python list, using double quotes for each keyword."
-                )
-            }
+                    "role": "system",
+                    "content": (
+                        "You are a helpful assistant that extracts movie-related keywords "
+                        "from user input in a specific format. Your task is to ensure the keywords "
+                        "align with those found in the TMDB database. If no relevant horror movie keywords can be found, "
+                        "return an empty array. Return the keywords in the following format:\n\n"
+                        "[\"keyword1\", \"keyword2\", \"keyword3\"]"
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        f"Extract the three most relevant TMDB movie-related keywords from this input: \"{user_input}\". "
+                        "Return the keywords as a Python list, using double quotes for each keyword. If no relevant "
+                        "horror movie keywords are found, return an empty array."
+                    )
+                }
             ],
             max_tokens=50,
             temperature=0.7
@@ -285,6 +286,7 @@ def extract_keywords(user_input):
     except Exception as e:
         print(f"Error in extract_keywords: {str(e)}")
         return []
+
 
 
 def get_genre_ids():
@@ -305,11 +307,11 @@ def get_movies_by_keywords(keywords, allowed_genres):
 
     movie_list = []
     for keyword in keywords:
-        search_url = f"{TMDB_API_URL}/search/keyword?api_key={TMDB_API_KEY}&query={keyword}"
+        search_url = f"{TMDB_API_URL}/search/keyword?api_key={TMDB_API_KEY}&query={keyword}&language=ko"
         response = requests.get(search_url).json()
         if response.get("results"):
             keyword_id = response["results"][0]["id"]
-            movies_url = f"{TMDB_API_URL}/keyword/{keyword_id}/movies?api_key={TMDB_API_KEY}"
+            movies_url = f"{TMDB_API_URL}/keyword/{keyword_id}/movies?api_key={TMDB_API_KEY}&language=ko"
             movies_response = requests.get(movies_url).json()
             movie_list.extend(movies_response.get("results", []))
 

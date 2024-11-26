@@ -3,32 +3,6 @@
     <!-- 캔버스 영역 -->
     <div class="canvas-container flex-1">
       <canvas ref="canvas" class="rounded-lg shadow-lg"></canvas>
-      <div
-        class="controls absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col gap-6"
-      >
-        <!-- 반시계방향 회전 버튼 -->
-        <button
-          @click="rotateCounterClockwise"
-          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-300"
-        >
-          <img
-            src="@/assets/arrowUp.png"
-            alt="rotate counterclockwise"
-            class="w-6 h-6"
-          />
-        </button>
-        <!-- 시계방향 회전 버튼 -->
-        <button
-          @click="rotateClockwise"
-          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-300"
-        >
-          <img
-            src="@/assets/arrowDown.png"
-            alt="rotate clockwise"
-            class="w-6 h-6"
-          />
-        </button>
-      </div>
     </div>
 
     <!-- 영화 정보 영역 -->
@@ -36,9 +10,9 @@
       class="movie-info flex flex-col justify-between p-4 bg-gray-800 text-white"
     >
       <h2 class="text-2xl font-semibold text-red-600 mb-4">
-        {{ movie.title }}
+        {{ featuredMovie.title }}
       </h2>
-      <p class="text-base mb-4">{{ movie.overview }}</p>
+      <p class="text-base mb-4">{{ featuredMovie.overview }}</p>
       <button
         class="bg-red-600 px-4 py-2 rounded-lg text-white hover:bg-red-700 transition duration-300"
         @click="goToMoviePage"
@@ -47,10 +21,26 @@
       </button>
     </div>
   </div>
+
+  <!-- 새로운 이전/다음 버튼 -->
+  <div class="navigation-buttons flex justify-center gap-4 mt-4">
+    <button
+      @click="rotateCounterClockwise"
+      class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-300"
+    >
+      이전
+    </button>
+    <button
+      @click="rotateClockwise"
+      class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-300"
+    >
+      다음
+    </button>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, defineProps } from "vue";
+import { ref, onMounted, watch, defineProps, computed } from "vue";
 import { useRouter } from "vue-router";
 
 const props = defineProps({
@@ -60,20 +50,26 @@ const props = defineProps({
   },
 });
 
-const movie = ref(props.movies[0]);
 const router = useRouter();
-
-const goToMoviePage = () => {
-  const movieId = movie.value.id;
-  router.push({ name: "MovieDetailView", params: { movie_id: movieId } });
-};
-
 const canvas = ref(null);
 const canvasWrapper = ref(null);
 const images = ref([]);
 const angle = ref(0);
-let targetAngle = ref(0);
+const targetAngle = ref(0);
 let animationFrameId = null;
+
+// 3시 방향의 영화 인덱스를 추적
+const featuredMovieIndex = ref(0);
+
+// 3시 방향의 영화 정보
+const featuredMovie = computed(() => {
+  return props.movies[featuredMovieIndex.value];
+});
+
+const goToMoviePage = () => {
+  const movieId = featuredMovie.value.id;
+  router.push({ name: "MovieDetailView", params: { movie_id: movieId } });
+};
 
 const resizeCanvas = () => {
   if (canvasWrapper.value && canvas.value) {
@@ -85,17 +81,17 @@ const resizeCanvas = () => {
 };
 
 const rotateClockwise = () => {
-  currentIndex.value =
-    (currentIndex.value - 1 + props.movies.length) % props.movies.length;
-  movie.value = props.movies[currentIndex.value];
   targetAngle.value += (2 * Math.PI) / 5;
+  featuredMovieIndex.value =
+    (featuredMovieIndex.value - 1 + props.movies.length) % props.movies.length;
+
   animateRotation();
 };
 
 const rotateCounterClockwise = () => {
-  currentIndex.value = (currentIndex.value + 1) % props.movies.length;
-  movie.value = props.movies[currentIndex.value];
   targetAngle.value -= (2 * Math.PI) / 5;
+  featuredMovieIndex.value =
+    (featuredMovieIndex.value + 1) % props.movies.length;
   animateRotation();
 };
 
@@ -171,7 +167,7 @@ const draw = () => {
       image,
       -imageWidth / 3, // 이미지의 중심을 맞추기 위해 수정
       -imageHeight / 3, // 이미지의 중심을 맞추기 위해 수정
-      imageWidth / 1.5,
+      imageWidth / 1.2,
       imageHeight / 1.5
     );
     ctx.restore();
@@ -196,9 +192,9 @@ const loadImages = () => {
     };
   });
 };
-
-const currentIndex = ref(0);
 </script>
+
+<!-- 이전 스타일 코드 동일 -->
 
 <style scoped>
 .canvas-wrapper {
@@ -211,16 +207,6 @@ const currentIndex = ref(0);
 .canvas-container {
   flex: 1;
   position: relative;
-}
-
-.controls {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  justify-content: center;
-  gap: 10px;
 }
 
 button {
@@ -267,5 +253,9 @@ canvas {
 
 .movie-info button:hover {
   background-color: #c53030;
+}
+
+.navigation-buttons {
+  margin-top: 1rem;
 }
 </style>

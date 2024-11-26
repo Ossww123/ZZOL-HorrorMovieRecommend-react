@@ -53,17 +53,21 @@
     />
 
     <div :style="containerStyle" class="content-container">
-      <h1>Article Page</h1>
-      <RouterLink :to="{ name: 'CreateView' }" class="create-link"
-        >Create</RouterLink
-      >
-      <div class="search-box">
-        <input
-          type="text"
-          v-model="searchKeyword"
-          @input="handleSearch"
-          placeholder="검색어를 입력하세요"
-        />
+      <h1>정보 게시판</h1>
+      <div class="search-create-container">
+        <!-- 검색창 -->
+        <div class="search-box">
+          <input
+            type="text"
+            v-model="searchKeyword"
+            @input="handleSearch"
+            placeholder="검색어를 입력하세요"
+          />
+        </div>
+        <!-- Create 버튼 -->
+        <RouterLink :to="{ name: 'CreateView' }" class="create-link"
+          >Create</RouterLink
+        >
       </div>
       <ArticleList :articles="filteredArticles" />
     </div>
@@ -186,6 +190,106 @@ updateImageSize();
 .content-container {
   position: relative;
   width: 100%;
+  max-width: 1200px; /* 최대 너비 지정 */
   margin: 0 auto;
+  padding: 30px 20px; /* 여백 추가 */
+  border-radius: 10px; /* 둥근 모서리 */
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #fff; /* 글자색을 하얗게 */
+  text-align: center;
+}
+
+.create-link {
+  display: inline-block;
+  margin-bottom: 30px;
+  padding: 12px 20px;
+  font-size: 1.2rem;
+  background-color: #f56565; /* 붉은색 */
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.create-link:hover {
+  background-color: #e53e3e;
+  transform: translateY(-2px); /* 약간 올라가는 효과 */
+}
+
+.create-link:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8); /* 포커스 시 테두리 강조 */
+}
+
+.search-box {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.search-box input {
+  width: 60%;
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  border: 1px solid #f56565; /* 붉은색 테두리 */
+  border-radius: 8px;
+  background-color: #333;
+  color: white;
+  transition: border-color 0.3s;
+}
+
+.search-box input:focus {
+  border-color: #e53e3e; /* 포커스 시 테두리 색상 변경 */
+  outline: none;
+}
+
+.search-box input::placeholder {
+  color: #aaa; /* 플레이스홀더 색상 */
+}
+
+.article-list-container {
+  margin-top: 20px;
+  padding-top: 10px;
+}
+
+.article-list-container ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.article-list-container li {
+  margin-bottom: 10px;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.article-list-container li:hover {
+  background-color: #333; /* 호버 시 밝아지는 효과 */
+}
+
+.article-list-container h2 {
+  font-size: 1.8rem;
+  color: #f56565; /* 제목 색상 */
+  margin-bottom: 10px;
+}
+
+.article-list-container p {
+  color: #ccc; /* 본문 색상 */
+  font-size: 1rem;
+}
+
+@media screen and (max-width: 768px) {
+  .search-box input {
+    width: 80%; /* 모바일에서는 검색창 크기 축소 */
+  }
+
+  .content-container {
+    padding: 20px 10px;
+  }
 }
 </style>
