@@ -209,10 +209,10 @@ const validateForm = () => {
     valid = false;
   }
 
-  if (!profileimage.value) {
-    errors.value.profileimage = "프로필 이미지를 선택하세요.";
-    valid = false;
-  }
+  // if (!profileimage.value) {
+  //   errors.value.profileimage = "프로필 이미지를 선택하세요.";
+  //   valid = false;
+  // }
 
   return valid;
 };
