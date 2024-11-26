@@ -1,10 +1,10 @@
 <template>
-  <MovieDetailInfo/>
+  <RandomMovieDetailInfo/>
   
 </template>
 
 <script setup>
- import MovieDetailInfo from '@/components/MovieDetailInfo.vue';
+ import RandomMovieDetailInfo from '@/components/RandomMovieDetailInfo.vue';
  
  
 </script>

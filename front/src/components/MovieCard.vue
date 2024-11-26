@@ -22,7 +22,7 @@ defineProps({
 });
 
 const goDetail = (movie) => {
-  router.push(`/${movie.id}`);
+  router.push(`/random/${movie.tmdb_Id}`);
 };
 </script>
 

@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import { useRoute } from "vue-router";
+import { useRoute, RouterView } from "vue-router";
 import AppNavbar from "@/components/Common/AppNavbar.vue";
 import { watchEffect, ref, computed } from "vue";
 

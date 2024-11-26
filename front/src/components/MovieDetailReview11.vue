@@ -1,10 +1,10 @@
 <template>
   <div>
     <h1>왓챠미디아 사용자 평</h1>
-    <p>{{ movie_pk }}</p>
+    <p>{{ tmdb_id }}</p>
     <div>
       <h1>리뷰 작성</h1>
-      <form @submit.prevent="createReview(movie_pk)">
+      <form @submit.prevent="createReview(tmdb_id)">
         <!-- 내용 입력 -->
         <div>
           <label for="content">내용 : </label>
@@ -45,9 +45,9 @@
     <MovieDetailReviewItem
       v-else
       v-for="review in store.reviews"
-      :key="`review-${review.id}-${Date.now()}`"
+      :key="review.id"
       :review="review"
-      :movie_pk="movie_pk"
+      :tmdb_id="tmdb_id"
       @reviewDeleted="onReviewDeleted"
     />
   </div>
@@ -69,42 +69,47 @@ const router = useRouter();
 
 const reviews = computed(() => store.reviews || []);
 
-const emit = defineEmits(["reviewCreated"]);
-
-defineProps({
-  movie_pk: String,
-});
-
-const createReview = async function (movie_pk) {
-  await axios({
-    method: "post",
-    url: `${store.API_URL}/api/v1/${movie_pk}/reviews/`,
-    data: {
-      rate: rate.value,
-      fear_score: fear_score.value,
-      content: content.value,
-    },
-    headers: {
-      Authorization: `Token ${store.token}`,
-    },
-  });
-  // 입력 폼 초기화
-  content.value = "";
-  rate.value = null;
-  fear_score.value = null;
-
-  // 리뷰 목록과 영화 정보 갱신
-  await store.getMovieReviews(movie_pk);
-  await store.getMovieDetail(movie_pk);
-  window.alert("성공");
-  emit("reviewChange");
-};
-
-const onReviewDeleted = async () => {
-  await store.getMovieReviews(movie_pk);
-  await store.getMovieDetail(movie_pk);
-  emit("reviewChange");
-};
+const emit = defineEmits(['reviewChange'])
+  
+    const props = defineProps({
+    tmdb_id: String
+})
+  
+    
+  
+    const createReview = function (tmdb_id) {
+        axios({
+          method: 'post'  ,
+          url: `${store.API_URL}/api/v1/random/${tmdb_id}/reviews/` , 
+          data: {
+            rate: rate.value,
+            fear_score: fear_score.value,
+            content: content.value,
+          },
+          headers: {
+            Authorization: `Token ${store.token}`
+          }
+        })
+        .then(async (res) => {
+          console.log("제발 됬다고 말해")
+          window.alert('성공!')
+          content.value = ''
+          rate.value = null
+          fear_score.value = null
+          emit('reviewChange')
+        })
+        .catch((err) => {
+          if (err.response.data.error) {
+        alert(err.response.data.error)
+      }
+        })
+      }
+      
+      const onReviewDeleted = async () => {
+        await store.getRandomMovieReviews(props.tmdb_id)
+        await store.getRandomMovieDetail(props.tmdb_id)
+        emit('reviewChange')
+      }
 </script>
 
 <style scoped></style>

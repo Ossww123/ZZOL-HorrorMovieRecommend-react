@@ -138,8 +138,8 @@ const fetchLatestMovies = async () => {
 // 영화 상세 정보를 저장하고 상세 페이지로 이동하는 함수
 const saveAndNavigate = async (movie) => {
   try {
-    await store.getMovieDetail(movie.id);
-    router.push(`/${movie.id}`);
+    await store.getRandomDetail(movie.tmdb_Id);
+    router.push(`/random/${movie.tmdb_Id}`);
   } catch (error) {
     console.error("Error:", error);
   }

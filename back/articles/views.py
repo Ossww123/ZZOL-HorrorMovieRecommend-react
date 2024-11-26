@@ -635,29 +635,29 @@ def recommends(request, article_pk):
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])  # 인증된 유저만 접근 가능
-def like_movie(request, movie_id):
+def like_movie(request, tmdb_id):
     if request.method == 'GET':
         try:
-            movie = Movie.objects.get(id=movie_id)
+            movie = Movie.objects.get(tmdb_Id=tmdb_id)
         except Movie.DoesNotExist:
             return Response({"detail": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user  # 현재 로그인한 유저
 
         # 유저가 해당 영화를 좋아요 목록에 포함하고 있는지 확인
-        is_liked = user.liked_movies.filter(id=movie.id).exists()
+        is_liked = user.liked_movies.filter(tmdb_Id=tmdb_id).exists()
         
         return Response({"is_liked": is_liked}, status=status.HTTP_200_OK)
     else:
         try:
-            movie = Movie.objects.get(id=movie_id)
+            movie = Movie.objects.get(tmdb_Id=tmdb_id)
         except Movie.DoesNotExist:
             return Response({"detail": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
 
         user = request.user  # 현재 로그인한 유저
 
         # 유저가 이미 해당 영화를 좋아요 목록에 추가했다면, 추가하지 않음
-        if user.liked_movies.filter(id=movie.id).exists():
+        if user.liked_movies.filter(tmdb_Id=tmdb_id).exists():
             return Response({"detail": "Movie already liked"}, status=status.HTTP_400_BAD_REQUEST)
         
         # 좋아요 추가
@@ -667,16 +667,16 @@ def like_movie(request, movie_id):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])  # 인증된 유저만 접근 가능
-def unlike_movie(request, movie_id):
+def unlike_movie(request, tmdb_id):
     try:
-        movie = Movie.objects.get(id=movie_id)
+        movie = Movie.objects.get(tmdb_Id=tmdb_id)
     except Movie.DoesNotExist:
         return Response({"detail": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
 
     user = request.user  # 현재 로그인한 유저
 
     # 유저가 해당 영화를 좋아요 목록에 추가한 적이 없다면
-    if not user.liked_movies.filter(id=movie.id).exists():
+    if not user.liked_movies.filter(tmdb_Id=tmdb_id).exists():
         return Response({"detail": "Movie not liked"}, status=status.HTTP_400_BAD_REQUEST)
 
     # 좋아요 취소
