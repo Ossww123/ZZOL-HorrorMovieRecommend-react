@@ -28,4 +28,9 @@ urlpatterns = [
     path('<int:review_pk>/comments/<int:comment_pk>/', views.comment_update),
     path('articles/<int:article_id>/comments/', views.article_comments),
     path('articles/<int:article_id>/comments/<int:comment_pk>/', views.article_comment_update),
+
+    # 좋아요 관련
+    path('movies/<int:movie_id>/like/', views.like_movie, name='like_movie'),
+    path('movies/<int:movie_id>/unlike/', views.unlike_movie, name='unlike_movie'),
+    path('user/liked-movies/', views.get_liked_movies, name='liked_movies'),
 ]

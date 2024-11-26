@@ -10,22 +10,38 @@
     <h1 class="text-center text-2xl font-bold mb-4">랜덤 영화 예고편</h1>
 
     <!-- 랜덤 예고편 표시 -->
-    <div v-if="randomTrailer" class="flex flex-col items-center">
-      <h2 class="text-xl font-semibold mb-4">{{ randomTrailer.movieTitle }}</h2>
-      <iframe
-        :src="'https://www.youtube.com/embed/' + randomTrailer.videoId"
-        width="800"
-        height="450"
-        frameborder="0"
-        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-      ></iframe>
-    </div>
+    <transition
+      name="slide-fade"
+      @before-enter="beforeEnter"
+      @enter="enter"
+      @leave="leave"
+    >
+      <div v-show="randomTrailer" class="flex flex-col items-center">
+        <h2 class="text-xl font-semibold mb-4">
+          {{ randomTrailer.movieTitle }}
+        </h2>
+        <iframe
+          :src="'https://www.youtube.com/embed/' + randomTrailer.videoId"
+          width="800"
+          height="450"
+          frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </transition>
 
     <!-- 예고편이 없을 경우 메시지 -->
-    <div v-else class="text-center text-gray-400">
-      <p>예고편을 찾을 수 없습니다.</p>
-    </div>
+    <transition
+      name="slide-fade"
+      @before-enter="beforeEnter"
+      @enter="enter"
+      @leave="leave"
+    >
+      <div v-show="!randomTrailer" class="text-center text-gray-400">
+        <p>예고편을 찾을 수 없습니다.</p>
+      </div>
+    </transition>
 
     <!-- "다음" 버튼 -->
     <div class="text-center mt-6">
@@ -40,7 +56,7 @@
 </template>
 
 <script setup>
-import { onMounted,  onBeforeUnmount,ref } from "vue";
+import { onMounted, onBeforeUnmount, ref } from "vue";
 import { useCounterStore } from "@/stores/counter"; // store 가져오기
 import axios from "axios";
 
@@ -95,7 +111,6 @@ const handleKeyDown = (event) => {
   }
 };
 
-
 onMounted(() => {
   getRandomTrailer(); // 페이지 로드 시 첫 랜덤 예고편 가져오기
   window.addEventListener("keydown", handleKeyDown); // keydown 이벤트 리스너 추가
@@ -107,5 +122,21 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* 스타일은 자유롭게 추가하세요 */
+/* 슬라이드 애니메이션 설정 */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.slide-fade-enter,
+.slide-fade-leave-to /* .slide-fade-leave-active in <2.1.8 */ {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.slide-fade-enter-to,
+.slide-fade-leave {
+  transform: translateX(0);
+  opacity: 1;
+}
 </style>
