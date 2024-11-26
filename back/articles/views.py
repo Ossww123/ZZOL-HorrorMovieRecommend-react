@@ -307,11 +307,11 @@ def get_movies_by_keywords(keywords, allowed_genres):
 
     movie_list = []
     for keyword in keywords:
-        search_url = f"{TMDB_API_URL}/search/keyword?api_key={TMDB_API_KEY}&query={keyword}"
+        search_url = f"{TMDB_API_URL}/search/keyword?api_key={TMDB_API_KEY}&query={keyword}&language=ko"
         response = requests.get(search_url).json()
         if response.get("results"):
             keyword_id = response["results"][0]["id"]
-            movies_url = f"{TMDB_API_URL}/keyword/{keyword_id}/movies?api_key={TMDB_API_KEY}"
+            movies_url = f"{TMDB_API_URL}/keyword/{keyword_id}/movies?api_key={TMDB_API_KEY}&language=ko"
             movies_response = requests.get(movies_url).json()
             movie_list.extend(movies_response.get("results", []))
 

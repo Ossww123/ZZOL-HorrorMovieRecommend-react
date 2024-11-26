@@ -1,38 +1,55 @@
-<!-- DetailView.vue -->
 <template>
-  <div
-    class="max-w-4xl mx-auto p-4 bg-gray-900 text-white rounded-lg shadow-md"
-  >
-    <h1 class="text-3xl font-semibold text-red-500 mb-6">게시글 상세</h1>
-    <div v-if="article">
-      <!-- 게시글 상세 정보 -->
-      <div class="bg-gray-800 p-6 rounded-lg mb-6">
-        <p class="text-sm text-gray-400">
-          게시글 번호: <span class="text-white">{{ article.id }}</span>
-        </p>
-        <p class="text-lg font-bold text-white mt-2">
-          제목: {{ article.title }}
-        </p>
-        <p class="text-gray-300 mt-2">
-          닉네임: <span class="text-red-400">{{ article.user.nickname }}</span>
-        </p>
-        <p class="text-gray-300 mt-2">작성일: {{ article.created_at }}</p>
-        <p class="text-gray-300 mt-2">수정일: {{ article.updated_at }}</p>
-        <p class="text-gray-300 mt-4">{{ article.content }}</p>
-      </div>
+  <div class="article-detail-container">
+    <!-- Article Header -->
+    <header class="article-header">
+      <h1 class="article-title">게시글 상세</h1>
+    </header>
 
-      <!-- 추천 버튼 -->
-      <div class="flex items-center gap-4 mb-6">
-        <button
-          @click="Recommend(article.id)"
-          class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded-lg focus:outline-none"
-        >
+    <!-- Article Content -->
+    <div v-if="article" class="article-content-wrapper">
+      <section class="article-metadata">
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <span class="metadata-label">제목:</span>
+            <span class="metadata-value title">{{ article.title }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">작성자:</span>
+            <span class="metadata-value author">{{
+              article.user.nickname
+            }}</span>
+          </div>
+          <div class="metadata-item metadata-dates">
+            <span class="metadata-label date-label">작성일:</span>
+            <span class="metadata-value date">{{
+              formatDate(article.created_at)
+            }}</span>
+          </div>
+          <div class="metadata-item metadata-dates">
+            <span class="metadata-label date-label">수정일:</span>
+            <span class="metadata-value date">{{
+              formatDate(article.updated_at)
+            }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Article Body -->
+      <article class="article-body">
+        <p class="article-text">{{ article.content }}</p>
+      </article>
+
+      <!-- Recommendation Section -->
+      <section class="recommendation-section">
+        <button @click="Recommend(article.id)" class="recommend-button">
           {{ isRecommended ? "추천 취소" : "추천" }} ({{ recommendCount }})
         </button>
-      </div>
+      </section>
 
-      <!-- 댓글 섹션 -->
-      <ArticleCommentList :article="article" />
+      <!-- Comments Section -->
+      <section class="comments-section">
+        <ArticleCommentList :article="article" />
+      </section>
     </div>
   </div>
 </template>
@@ -50,6 +67,12 @@ const article = ref(null);
 const isRecommended = ref(false);
 const recommendCount = ref(0);
 
+// 날짜 포맷팅 함수
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  return dateString.split("T")[0];
+};
+
 // 게시글 조회
 onMounted(() => {
   axios({
@@ -57,9 +80,8 @@ onMounted(() => {
     url: `${store.API_URL}/api/v1/articles/${route.params.id}/`,
   })
     .then((res) => {
-      article.value = res.data
-      console.log(isRecommended.value)
-      checkRecommendStatus()
+      article.value = res.data;
+      checkRecommendStatus();
     })
     .catch((err) => {
       console.log(err);
@@ -73,20 +95,18 @@ const Recommend = async function (articleId) {
       method: "post",
       url: `${store.API_URL}/api/v1/articles/${articleId}/recommends/`,
       headers: {
-        Authorization: `Token ${store.token}`
-      }
-    })
-    isRecommended.value = !isRecommended.value
-    console.log(isRecommended.value)
-    recommendCount.value = response.data.recommend_count
+        Authorization: `Token ${store.token}`,
+      },
+    });
+    isRecommended.value = !isRecommended.value;
+    recommendCount.value = response.data.recommend_count;
 
-    // 추천 상태 변경 후 게시글 정보 업데이트
+    // 게시글 정보 업데이트
     const articleResponse = await axios({
-      method: 'get',
-      url: `${store.API_URL}/api/v1/articles/${articleId}/`
-    })
-    article.value = articleResponse.data
-    console.log(article.value)
+      method: "get",
+      url: `${store.API_URL}/api/v1/articles/${articleId}/`,
+    });
+    article.value = articleResponse.data;
   } catch (err) {
     console.log(err);
   }
@@ -102,93 +122,80 @@ const checkRecommendStatus = () => {
 </script>
 
 <style scoped>
-.detail-view {
-  padding: 20px;
-  background-color: #121212; /* 어두운 배경 */
-  color: white;
-}
-
-.detail-title {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #e53e3e; /* 공포 영화 느낌의 빨간색 */
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.article-detail-card {
-  background-color: #1a202c;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  margin-bottom: 30px;
+.article-detail-container {
+  @apply max-w-3xl mx-auto p-6 bg-gray-800 text-white rounded-lg shadow-lg;
 }
 
 .article-header {
-  margin-bottom: 20px;
-}
-
-.article-id {
-  font-size: 1rem;
-  color: #cbd5e0; /* 밝은 회색 */
+  @apply mb-8;
 }
 
 .article-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #f56565; /* 빨간색 */
-  margin-top: 10px;
+  @apply text-4xl font-semibold text-red-500;
 }
 
-.article-meta {
-  font-size: 0.875rem;
-  color: #e2e8f0;
-  margin-bottom: 20px;
+.article-metadata {
+  @apply bg-gray-700 p-6 rounded-lg mb-8;
 }
 
-.author-name {
-  color: #f56565; /* 닉네임 강조 */
+.metadata-grid {
+  @apply grid grid-cols-2 gap-4;
 }
 
-.article-content {
-  font-size: 1.125rem;
-  color: #e2e8f0;
-  line-height: 1.6;
+.metadata-item {
+  @apply flex items-center;
 }
 
-.recommend-section {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
+.metadata-label {
+  @apply font-bold mr-2 text-sm text-gray-300;
+}
+
+.metadata-label.date-label {
+  @apply text-xs text-gray-400;
+}
+
+.metadata-value {
+  @apply text-sm;
+}
+
+.metadata-value.title {
+  @apply text-xl font-bold text-white;
+}
+
+.metadata-value.author {
+  @apply text-red-400;
+}
+
+.metadata-value.date {
+  @apply text-xs text-gray-400;
+}
+
+.article-body {
+  @apply mb-8;
+}
+
+.article-text {
+  @apply text-gray-300 leading-relaxed text-base;
+}
+
+.recommendation-section {
+  @apply flex justify-center mb-8;
 }
 
 .recommend-button {
-  padding: 10px 20px;
-  background-color: #f56565;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s, transform 0.3s;
-}
-
-.recommend-button:hover {
-  background-color: #c53030;
-  transform: scale(1.05);
+  @apply bg-red-500 hover:bg-red-700 text-white py-3 px-6 
+         rounded-lg focus:outline-none 
+         transform transition-all duration-300 
+         flex items-center gap-2;
 }
 
 @media (max-width: 768px) {
-  .detail-title {
-    font-size: 1.75rem;
+  .metadata-grid {
+    @apply grid-cols-1;
   }
 
   .article-title {
-    font-size: 1.25rem;
-  }
-
-  .article-content {
-    font-size: 1rem;
+    @apply text-3xl;
   }
 }
 </style>
