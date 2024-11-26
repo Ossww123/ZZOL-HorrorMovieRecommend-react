@@ -49,6 +49,7 @@ onMounted(() => {
   })
     .then((res) => {
       article.value = res.data
+      console.log(isRecommended.value)
       checkRecommendStatus()
     })
     .catch((err) => {
@@ -67,6 +68,7 @@ const Recommend = async function(articleId) {
       }
     })
     isRecommended.value = !isRecommended.value
+    console.log(isRecommended.value)
     recommendCount.value = response.data.recommend_count
 
     // 추천 상태 변경 후 게시글 정보 업데이트
@@ -75,6 +77,7 @@ const Recommend = async function(articleId) {
       url: `${store.API_URL}/api/v1/articles/${articleId}/`
     })
     article.value = articleResponse.data
+    console.log(article.value)
   } catch (err) {
     console.log(err)
   }

@@ -2,7 +2,7 @@
 <template>
   <div class="container">
     <div class="login-form">
-      <h1>Log In</h1>
+      <h1 class="text-2xl font-bold">LogIn</h1>
       <form @submit.prevent="logIn">
         <!-- Username -->
         <label for="username">Username: </label>
@@ -59,8 +59,8 @@ const logIn = function () {
 
 /* 로그인 폼 스타일 */
 .login-form {
-  background-color: white;
-  border: 2px solid #ccc;
+  background-color: #2b2f3b; /* Q1의 더 어두운 상세 배경색 적용 */
+  border: 2px solid #2b2f3b;
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -78,14 +78,14 @@ form {
 }
 
 h1 {
-  color: black;
+  color: rgb(255, 255, 255);
   text-align: center;
 }
 
 label {
   font-size: 14px;
   margin-bottom: 4px;
-  color: black;
+  color: rgb(255, 255, 255);
 }
 
 input {
@@ -98,7 +98,7 @@ input {
 }
 
 input[type="submit"] {
-  background-color: #4CAF50;
+  background-color: #3a803c;
   color: white;
   border: none;
   cursor: pointer;
@@ -108,7 +108,7 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-  background-color: #45a049;
+  background-color: #4caf50;
 }
 
 input[type="submit"]:disabled {

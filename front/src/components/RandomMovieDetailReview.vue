@@ -103,24 +103,43 @@ const setFearScore = (value) => {
     
   
 const createReview = async function (tmdb_id) {
-  await axios({
-    method: "post",
-    url: `${store.API_URL}/api/v1/random/${tmdb_id}/reviews/`,
-    data: {
-      rate: rate.value,
-      fear_score: fear_score.value,
-      content: content.value,
-    },
-    headers: {
-      Authorization: `Token ${store.token}`,
-    },
-  });
-  // 입력 폼 초기화
-  content.value = "";
-  rate.value = null;
-  fear_score.value = null;
-  window.alert("성공");
-  emit("reviewChange");
+  try {
+    // 리뷰 생성 요청
+    await axios({
+      method: "post",
+      url: `${store.API_URL}/api/v1/random/${tmdb_id}/reviews/`,
+      data: {
+        rate: rate.value,
+        fear_score: fear_score.value,
+        content: content.value,
+      },
+      headers: {
+        Authorization: `Token ${store.token}`,
+      },
+    });
+
+    // 입력 폼 초기화
+    content.value = "";
+    rate.value = null;
+    fear_score.value = null;
+
+    // 리뷰 목록과 영화 정보 갱신
+    await store.getMovieReviews(props.tmdb_id);
+    await store.getMovieDetail(props.tmdb_id);
+
+    // 성공 메시지
+    window.alert("성공");
+    emit("reviewChange");
+  } catch (error) {
+    // 에러 처리
+    if (error.response && error.response.data) {
+      // 백엔드에서 반환한 에러 메시지 출력
+      window.alert(`에러 발생: ${error.response.data.error}`);
+    } else {
+      // 네트워크 오류 또는 기타 예외 처리
+      window.alert("리뷰 생성 중 알 수 없는 오류가 발생했습니다.");
+    }
+  }
 };
       
       const onReviewDeleted = async () => {
