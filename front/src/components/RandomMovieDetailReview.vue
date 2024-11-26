@@ -13,8 +13,6 @@
     />
     <h1>리뷰 작성</h1>
     <form @submit.prevent="createReview(tmdb_id)">
-      
-
       <!-- 평점 -->
       <div>
         <label for="rate">평점</label>
@@ -55,39 +53,39 @@
     </form>
   </div>
 </template>
-  
-  <script setup>
-    import RandomMovieDetailReviewItem from '@/components/RandomMovieDetailReviewItem.vue'
-    import { ref, computed } from 'vue'
-    import { useCounterStore } from '@/stores/counter'
-    import axios from 'axios'
-    import { useRouter } from 'vue-router'
-    
-    const store = useCounterStore()
-    const title = ref(null)
-    const content = ref(null)
-    const rate = ref(null)
-    const fear_score = ref(null)
-    const router = useRouter()
-    const reviews = computed(() => store.reviews || []);
-    const emit = defineEmits(['reviewChange'])
-  
-    const props = defineProps({
-    tmdb_id: String
-})
-    // 평점 및 공포지수 이미지 결정 함수
+
+<script setup>
+import RandomMovieDetailReviewItem from "@/components/RandomMovieDetailReviewItem.vue";
+import { ref, computed } from "vue";
+import { useCounterStore } from "@/stores/counter";
+import axios from "axios";
+import { useRouter } from "vue-router";
+
+const store = useCounterStore();
+const title = ref(null);
+const content = ref(null);
+const rate = ref(null);
+const fear_score = ref(null);
+const router = useRouter();
+const reviews = computed(() => store.reviews || []);
+const emit = defineEmits(["reviewChange"]);
+
+const props = defineProps({
+  tmdb_id: String,
+});
+// 평점 및 공포지수 이미지 결정 함수
 const getStarImage = (score, index) => {
   if (index <= score) {
-    return '/images/star_full.png'; // 꽉 찬 별
+    return "/images/star_full.png"; // 꽉 찬 별
   }
-  return '/images/star_empty.png'; // 빈 별
+  return "/images/star_empty.png"; // 빈 별
 };
 
 const getGhostImage = (score, index) => {
   if (index <= score) {
-    return '/images/ghost_full.png'; // 꽉 찬 별
+    return "/images/ghost_full.png"; // 꽉 찬 별
   }
-  return '/images/ghost_empty.png'; // 빈 별
+  return "/images/ghost_empty.png"; // 빈 별
 };
 
 // 평점 값 설정
@@ -100,38 +98,55 @@ const setFearScore = (value) => {
   fear_score.value = value;
 };
 
-    
-  
 const createReview = async function (tmdb_id) {
-  await axios({
-    method: "post",
-    url: `${store.API_URL}/api/v1/random/${tmdb_id}/reviews/`,
-    data: {
-      rate: rate.value,
-      fear_score: fear_score.value,
-      content: content.value,
-    },
-    headers: {
-      Authorization: `Token ${store.token}`,
-    },
-  });
-  // 입력 폼 초기화
-  content.value = "";
-  rate.value = null;
-  fear_score.value = null;
-  window.alert("성공");
+  try {
+    // 리뷰 생성 요청
+    await axios({
+      method: "post",
+      url: `${store.API_URL}/api/v1/random/${tmdb_id}/reviews/`,
+      data: {
+        rate: rate.value,
+        fear_score: fear_score.value,
+        content: content.value,
+      },
+      headers: {
+        Authorization: `Token ${store.token}`,
+      },
+    });
+
+    // 입력 폼 초기화
+    content.value = "";
+    rate.value = null;
+    fear_score.value = null;
+
+    // 리뷰 목록과 영화 정보 갱신
+    await store.getMovieReviews(props.tmdb_id);
+    await store.getMovieDetail(props.tmdb_id);
+
+    // 성공 메시지
+    window.alert("성공");
+    emit("reviewChange");
+  } catch (error) {
+    // 에러 처리
+    if (error.response && error.response.data) {
+      // 백엔드에서 반환한 에러 메시지 출력
+      window.alert(`에러 발생: ${error.response.data.error}`);
+    } else {
+      // 네트워크 오류 또는 기타 예외 처리
+      window.alert("리뷰 생성 중 알 수 없는 오류가 발생했습니다.");
+    }
+  }
+};
+
+const onReviewDeleted = async () => {
+  await store.getRandomMovieReviews(props.tmdb_id);
+  await store.getRandomMovieDetail(props.tmdb_id);
   emit("reviewChange");
 };
-      
-      const onReviewDeleted = async () => {
-        await store.getRandomMovieReviews(props.tmdb_id)
-        await store.getRandomMovieDetail(props.tmdb_id)
-        emit('reviewChange')
-      }
-  </script>
-  
-  <style scoped>
-  /* 전체 폼 컨테이너 */
+</script>
+
+<style scoped>
+/* 전체 폼 컨테이너 */
 form {
   width: 100%; /* 전체 너비 차지 */
   background-color: rgba(20, 20, 20, 0.9);
