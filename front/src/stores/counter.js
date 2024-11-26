@@ -222,6 +222,34 @@ export const useCounterStore = defineStore(
         });
     };
 
+    const searchArticles = async function (keyword) {
+      try {
+        const response = await axios({
+          method: 'get',
+          url: `${API_URL}/api/v1/articles/`,
+          headers: {
+            Authorization: `Token ${token.value}`
+          }
+        })
+        
+        // 검색어가 있는 경우 필터링
+        if (keyword) {
+          const filtered = response.data.filter(article => 
+            article.title.toLowerCase().includes(keyword.toLowerCase()) ||
+            article.content.toLowerCase().includes(keyword.toLowerCase())
+          )
+          articles.value = filtered
+        } else {
+          articles.value = response.data
+        }
+        
+        return articles.value
+      } catch (err) {
+        console.log(err)
+        return []
+      }
+    }
+
     // 랜덤 영화
     const getRandomMovies = async () => {
       const response = await axios.get(`${API_URL}/api/v1/random/`);
@@ -381,6 +409,7 @@ export const useCounterStore = defineStore(
       email,
       likeMovie,
       unlikeMovie,
+      searchArticles,
     };
   },
   { persist: true }
