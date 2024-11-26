@@ -67,51 +67,46 @@
     </div>
 
     <!-- 감독 및 배우 섹션 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- 감독 -->
-      <div>
-        <h3 class="text-2xl font-semibold text-red-500 mb-4">감독</h3>
-        <div class="flex gap-4 items-center">
-          <div
-            v-for="directorId in movie.movie_director"
-            :key="directorId"
-            class="text-center"
-          >
-            <div v-if="directors[directorId]">
-              <img
-                v-if="directors[directorId].profile_path"
-                :src="`https://image.tmdb.org/t/p/w200${directors[directorId].profile_path}`"
-                :alt="directors[directorId].name"
-                class="w-20 h-20 rounded-full object-cover"
-              />
-              <p class="text-gray-300 mt-2">{{ directors[directorId].name }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 배우 -->
-      <div>
-        <h3 class="text-2xl font-semibold text-red-500 mb-4">출연 배우</h3>
-        <div class="grid grid-cols-3 gap-4">
-          <div
-            v-for="actorId in movie.movie_actor"
-            :key="actorId"
-            class="text-center"
-          >
-            <div v-if="actors[actorId]">
-              <img
-                v-if="actors[actorId].profile_path"
-                :src="`https://image.tmdb.org/t/p/w200${actors[actorId].profile_path}`"
-                :alt="actors[actorId].name"
-                class="w-20 h-20 rounded-full object-cover"
-              />
-              <p class="text-gray-300 mt-2">{{ actors[actorId].name }}</p>
-            </div>
-          </div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <!-- 감독 -->
+  <div>
+    <h3 class="text-2xl font-semibold text-red-500 mb-4">감독</h3>
+    <div class="flex gap-4 items-center">
+      <div v-for="directorId in movie.movie_director" :key="directorId" class="text-center">
+        <div v-if="directors[directorId]">
+          <img
+            :src="directors[directorId].profile_path 
+                    ? `https://image.tmdb.org/t/p/w200${directors[directorId].profile_path}`
+                    : require('@/assets/default-profile.png')"
+            :alt="directors[directorId].name"
+            class="w-20 h-20 rounded-full object-cover"
+          />
+          <p class="text-gray-300 mt-2">{{ directors[directorId].name }}</p>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- 배우 -->
+  <div>
+    <h3 class="text-2xl font-semibold text-red-500 mb-4">출연 배우</h3>
+    <div class="grid grid-cols-3 gap-4">
+      <div v-for="actorId in movie.movie_actor" :key="actorId" class="text-center">
+        <div v-if="actors[actorId]">
+          <img
+            :src="actors[actorId].profile_path
+                    ? `https://image.tmdb.org/t/p/w200${actors[actorId].profile_path}`
+                    : require('@/assets/default-profile.png')"
+            :alt="actors[actorId].name"
+            class="w-20 h-20 rounded-full object-cover"
+          />
+          <p class="text-gray-300 mt-2">{{ actors[actorId].name }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     <!-- 예고편 -->
     <div class="mt-8">
