@@ -7,9 +7,9 @@
     <MovieDetailReviewItem
       v-else
       v-for="review in store.reviews"
-      :key="`review-${review.id}-${Date.now()}`"
+      :key="review.id"
       :review="review"
-      :movie_pk="movie_pk"
+      :tmdb_id="tmdb_id"
       @reviewDeleted="onReviewDeleted"
     />
 

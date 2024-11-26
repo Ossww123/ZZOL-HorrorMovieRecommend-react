@@ -52,9 +52,8 @@
     </div>
     
     <ReviewCommentsList
-      :key="`comments-${review.id}-${Date.now()}`"
       :review_pk="review.id"
-      :movie_pk="movie_pk"
+      :movie_pk="tmdb_id"
     />
   </div>
 </template>

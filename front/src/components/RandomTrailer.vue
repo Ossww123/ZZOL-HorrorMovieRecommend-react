@@ -20,6 +20,9 @@
         <h2 class="text-xl font-semibold mb-4">
           {{ randomTrailer.movieTitle }}
         </h2>
+        <RouterLink :to="`/random/${randomTrailer.id}`">
+            {{ randomTrailer.movieTitle }}
+        </RouterLink>
         <iframe
           :src="'https://www.youtube.com/embed/' + randomTrailer.videoId"
           width="800"
@@ -59,12 +62,15 @@
 import { onMounted, onBeforeUnmount, ref } from "vue";
 import { useCounterStore } from "@/stores/counter"; // store 가져오기
 import axios from "axios";
+import { random } from "lodash";
+import { useRouter } from "vue-router";
 
 const store = useCounterStore();
 const randomTrailer = ref(null); // 랜덤 예고편을 담을 변수
 const isLoading = ref(true); // 로딩 상태
-
+const movie = ref([])
 const apiKey = import.meta.env.VITE_TMDB; // TMDB API 키
+const router = useRouter()
 
 // 영화 목록에서 랜덤 예고편을 가져오는 함수
 const getRandomTrailer = async () => {
@@ -74,7 +80,7 @@ const getRandomTrailer = async () => {
 
   // 랜덤으로 영화 하나 선택
   const randomMovie = movies[Math.floor(Math.random() * movies.length)];
-
+  
   try {
     // TMDB API에서 해당 영화의 예고편 정보 가져오기
     const response = await axios.get(
@@ -87,9 +93,10 @@ const getRandomTrailer = async () => {
     if (trailers.length > 0) {
       const randomTrailerData =
         trailers[Math.floor(Math.random() * trailers.length)];
-
+      
       // YouTube 영상 ID로 예고편 정보 설정
       randomTrailer.value = {
+        id: randomMovie.tmdb_Id,
         movieTitle: randomMovie.title,
         videoId: randomTrailerData.key,
       };
@@ -119,6 +126,12 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener("keydown", handleKeyDown);
 });
+
+const goDetail = (movie) => {
+  router.push(`/random/${movie.id}`);
+};
+
+
 </script>
 
 <style scoped>

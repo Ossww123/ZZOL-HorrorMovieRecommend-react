@@ -120,7 +120,7 @@
     </div>
 
     <!-- 리뷰 -->
-    <MovieDetailReview :movie_pk="movieId" @reviewChange="updateMovieData" />
+    <MovieDetailReview :tmdb_id="movieId" @reviewChange="updateMovieData" />
   </div>
 
   <!-- 로딩 메시지 -->
@@ -185,7 +185,7 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { useCounterStore } from "@/stores/counter";
-import { onMounted, computed, ref } from "vue";
+import { onMounted, computed, ref, watch } from "vue";
 import YoutubeTrailerModal from "./YoutubeTrailerModal.vue";
 import MovieDetailReview from "@/components/MovieDetailReview.vue";
 import { onBeforeRouteUpdate } from "vue-router";
@@ -337,55 +337,65 @@ const genreList = [
   { id: 10769, name: "외국" },
 ];
 
-onMounted(async () => {
-  store.getMovies();
-  console.log("Movies in store:", store.movies); // movies 상태 확인
-  store.getMovieDetail(movieId);
-  movie.value = store.movieDetail;
-  store.getMovieReviews(movieId);
-  // store.movies에서 해당 movieId에 맞는 영화를 찾음
-
-  // 영화의 러닝타임을 가져옴
-  await getMovieRuntime(movie.value.tmdb_Id);
-
-  // const movie = store.movies.find((movie)) movie.id == movieId)
-
-  await getKeyword(movie.value.tmdb_Id);
-  // keywords.value = movieKeywords; // 영화의 러닝타임을 상태에 저장
-
-  getDirector(movie.value.movie_director);
-  console.log("감독");
-  console.log(movie.value.movie_director);
-  getActor(movie.value.movie_actor);
-  console.log("배우");
-  console.log(movie.value.movie_actor);
-
-  // movies가 비어있지 않으면 로딩 상태 false로 설정
-  const interval = setInterval(() => {
-    if (store.movies.length > 0) {
-      isLoading.value = false;
-      checkIfLiked();
-      clearInterval(interval);
+watch(() => route.params.movie_id, 
+  async (newId) => {
+    if (newId) {
+      isLoading.value = true;
+      try {
+        await store.getRandomDetail(newId);
+        movie.value = store.randomDetail;
+        await getMovieRuntime(movie.value.tmdb_Id);
+        await getKeyword(movie.value.tmdb_Id);
+        await getDirector(movie.value.movie_director);
+        await getActor(movie.value.movie_actor);
+      } finally {
+        isLoading.value = false;
+      }
     }
-  }, 100);
-  isLoading.value = true; // 데이터 로딩 시작
-  await loadMovieData();
-  isLoading.value = false; // 데이터 로딩 완료
-});
+  },
+  { immediate: true }
+);
+
+
+  onMounted(async () => {
+    store.getRandomMovies();
+    console.log("Movies in store:", store.movies); // movies 상태 확인
+    store.getRandomDetail(movieId);
+    movie.value = store.randomDetail;
+    store.getRandomMovieReviews(movieId);
+    console.log()
+    // store.movies에서 해당 movieId에 맞는 영화를 찾음
+  
+    // 영화의 러닝타임을 가져옴
+    await getMovieRuntime(movie.value.tmdb_Id);
+  
+    // const movie = store.movies.find((movie)) movie.id == movieId)
+    
+    await getKeyword(movie.value.tmdb_Id);
+    // keywords.value = movieKeywords; // 영화의 러닝타임을 상태에 저장
+    
+    getDirector(movie.value.movie_director)
+    console.log('감독')
+    console.log(movie.value.movie_director)
+    getActor(movie.value.movie_actor)
+    console.log('배우')
+    console.log(movie.value.movie_actor)
+  
+    // movies가 비어있지 않으면 로딩 상태 false로 설정
+    const interval = setInterval(() => {
+      if (store.movies.length > 0) {
+        isLoading.value = false;
+        clearInterval(interval);
+      }
+    }, 100);
+  });
+  
 
 const updateMovieData = async () => {
   await store.getMovieReviews(movieId); // 리뷰 목록 갱신
   await store.getMovieDetail(movieId); // 영화 정보 갱신
   movie.value = store.movieDetail; // 화면 갱신
 };
-
-onBeforeRouteUpdate(async (to, from, next) => {
-  // 페이지가 변경될 때마다 영화 데이터를 새로 로딩
-  isLoading.value = true; // 데이터 로딩 시작
-  await loadMovieData();
-  isLoading.value = false; // 데이터 로딩 완료
-  next(); // 경로 업데이트가 끝난 후 다음 동작 진행
-});
 
 const loadMovieData = async () => {
   // movie 데이터 로드 및 기타 관련 작업

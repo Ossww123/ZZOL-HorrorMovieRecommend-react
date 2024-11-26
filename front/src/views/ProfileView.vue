@@ -25,13 +25,14 @@
           v-for="movie in likedMovies"
           :key="movie.id"
           class="movie-card mb-4"
+          @click="goDetail(movie)"
         >
           <img
             :src="'https://image.tmdb.org/t/p/w500' + movie.image"
             alt="Movie Image"
             class="w-24 h-32 object-cover rounded-md mb-2"
           />
-          <p @click="goDetail(movie)" class="text-center">{{ movie.title }}</p>
+          <p class="text-center">{{ movie.title }}</p>
         </li>
       </ul>
     </div>
@@ -90,7 +91,7 @@ const fetchLikedMovies = async () => {
 
 
 const goDetail = (movie) => {
-  router.push(`/${movie.id}`);
+  router.push(`/random/${movie.tmdb_id}`);
 };
 </script>
 
