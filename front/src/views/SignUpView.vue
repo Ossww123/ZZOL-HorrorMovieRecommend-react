@@ -244,6 +244,18 @@ const signUp = async () => {
         // 'Content-Type'은 FormData를 사용할 때 자동으로 설정되므로 제거
       },
     });
+    const loginData = {
+      username: username.value,
+      password: password1.value
+    };
+    
+    const loginResponse = await axios.post("http://127.0.0.1:8000/accounts/login/", loginData);
+    
+    // 토큰 저장 및 상태 업데이트
+    store.token = loginResponse.data.key;
+    await store.fetchUserProfile();
+    
+    // 홈으로 이동
     router.push('/');
   } catch (error) {
     console.error(

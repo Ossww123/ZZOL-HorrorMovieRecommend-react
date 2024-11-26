@@ -302,7 +302,7 @@ export const useCounterStore = defineStore(
         .then((res) => {
           token.value = res.data.key;
           fetchUserProfile(); // 로그인 후 유저 프로필 이미지 가져오기
-          router.push({ name: "ArticleView" });
+          router.push({ name: "HomeView" });
           // console.log(res.data)
           // console.log('로그인 성공')
         })
@@ -321,7 +321,7 @@ export const useCounterStore = defineStore(
           console.log(res.data);
           token.value = null;
           profileImage.value = ""; // 로그아웃 시 프로필 이미지 초기화
-          router.push({ name: "ArticleView" });
+          router.push({ name: "HomeView" });
         })
         .catch((err) => {
           console.log(err);
