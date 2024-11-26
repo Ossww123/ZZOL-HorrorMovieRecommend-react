@@ -229,26 +229,17 @@ export const useCounterStore = defineStore(
           url: `${API_URL}/api/v1/articles/`,
           headers: {
             Authorization: `Token ${token.value}`
-          }
-        })
-        
-        // 검색어가 있는 경우 필터링
-        if (keyword) {
-          const filtered = response.data.filter(article => 
-            article.title.toLowerCase().includes(keyword.toLowerCase()) ||
-            article.content.toLowerCase().includes(keyword.toLowerCase())
-          )
-          articles.value = filtered
-        } else {
-          articles.value = response.data
-        }
-        
-        return articles.value
+          },
+          params: { keyword } // 쿼리 파라미터로 검색어 전달
+        });
+    
+        articles.value = response.data; // 백엔드에서 필터링된 결과 사용
+        return articles.value;
       } catch (err) {
-        console.log(err)
-        return []
+        console.log(err);
+        return [];
       }
-    }
+    };
 
     // 랜덤 영화
     const getRandomMovies = async () => {

@@ -1,7 +1,7 @@
 # back/articles/views.py
 import random
 import json
-from django.db.models import Count
+from django.db.models import Count, Q
 import requests
 from pprint import pprint as pp
 from rest_framework import status
@@ -77,20 +77,25 @@ def article_list(request):
     게시글 목록 조회 (GET) 또는 게시글 생성 (POST)
     """
     if request.method == 'GET':
+        keyword = request.query_params.get('keyword', None)  # 검색어 가져오기
         articles = Article.objects.all()
+
+        if keyword:  # 검색어 필터링
+            articles = articles.filter(
+                Q(title__icontains=keyword) | Q(content__icontains=keyword)
+            )
+
         top_articles = articles.annotate(
-        recommend_count=Count('recommend_users')
+            recommend_count=Count('recommend_users')
         ).order_by('-recommend_count')[:3]
-        
-        # 나머지 게시글 최신순 정렬 (상위 3개 제외)
+
         remaining_articles = articles.exclude(
             id__in=top_articles.values_list('id', flat=True)
         ).order_by('-created_at')
-        
-        # 두 쿼리셋 합치기
+
         serializer_top = ArticleListSerializer(top_articles, many=True)
         serializer_remaining = ArticleListSerializer(remaining_articles, many=True)
-        
+
         return Response({
             'top_articles': serializer_top.data,
             'remaining_articles': serializer_remaining.data

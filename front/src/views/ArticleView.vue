@@ -138,10 +138,10 @@ const handleSearch = debounce(async () => {
   filteredArticles.value = results;
 }, 300);
 
-onMounted(() => {
-  store.getArticles();
-  handleSearch();
-});
+onMounted(async () => {
+  await store.getArticles() // 먼저 전체 게시글을 가져옴
+  handleSearch() // 그 다음 검색 처리
+})
 
 // 화면 크기에 따른 이미지 크기 조정
 const updateImageSize = () => {
