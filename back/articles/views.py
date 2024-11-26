@@ -87,7 +87,7 @@ def article_list(request):
 
         top_articles = articles.annotate(
             recommend_count=Count('recommend_users')
-        ).order_by('-recommend_count')[:3]
+        ).filter(recommend_count__gt=0).order_by('-recommend_count')[:3]
 
         remaining_articles = articles.exclude(
             id__in=top_articles.values_list('id', flat=True)

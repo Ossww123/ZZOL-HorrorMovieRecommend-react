@@ -1,8 +1,8 @@
 <!--SignUpView.vue-->
 <template>
   <div class="w-full max-w-md p-6">
-    <div class="bg-white rounded-xl shadow-lg p-8">
-      <h1 class="text-2xl font-bold text-black text-center mb-6">
+    <div class="signup-form">
+      <h1 class="text-2xl font-bold text-center mb-6">
         Sign Up Page
       </h1>
 
@@ -282,16 +282,16 @@ const signUp = async () => {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: black;
+  background-color: #2d3748; /* Q1의 배경색 적용 */
 }
 
 /* 회원가입 폼 스타일 */
 .signup-form {
-  background-color: white;
-  border: 2px solid #ccc;
+  background-color: #2b2f3b; /* Q1의 더 어두운 상세 배경색 적용 */
+  border: 2px solid #2b2f3b;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Q1과 동일한 그림자 효과 */
   width: 100%;
   max-width: 400px;
   max-height: 80vh;
@@ -306,14 +306,14 @@ form {
 }
 
 h1 {
-  color: black;
+  color: #ffffff; /* Q1의 붉은 제목 색상 적용 */
   text-align: center;
 }
 
 label {
   font-size: 14px;
   margin-bottom: 4px;
-  color: black;
+  color: rgb(255, 255, 255); /* Q1의 텍스트 색상 적용 */
 }
 
 input {
@@ -322,46 +322,39 @@ input {
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 16px;
-  color: black;
 }
 
+/* 입력 필드 텍스트 색상 */
+input[type="text"],
+input[type="password"] {
+  color: rgb(0, 0, 0); /* Q1의 텍스트 색상 적용 */
+}
+
+input[type="file"] {
+  color: rgb(255, 255, 255); /* Q1의 텍스트 색상 적용 */
+}
+
+/* 제출 버튼 스타일 */
 input[type="submit"] {
-  background-color: #4caf50;
-  color: white;
+  background-color: #3a803c; /* Q1의 버튼 배경색 적용 */
+  color: white; /* 버튼 텍스트 색상 */
   border: none;
   cursor: pointer;
   font-size: 16px;
   border-radius: 6px;
-  padding: 10px;
 }
 
 input[type="submit"]:hover {
-  background-color: #45a049;
+  background-color: #4caf50; /* Q1의 버튼 호버 배경색 적용 */
 }
 
 input[type="submit"]:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+  background-color: #ccc; /* 비활성화 상태는 기존과 동일 */
 }
 
 /* 로딩 스피너 스타일 */
 .spinner {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-  margin: 10px auto;
-}
-
-/* 스피너 회전 애니메이션 */
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  border: 4px solid #f3f3f3; 
+  border-top: 4px solid #3498db; 
 }
 </style>

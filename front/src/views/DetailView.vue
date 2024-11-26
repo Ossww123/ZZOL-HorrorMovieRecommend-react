@@ -57,8 +57,9 @@ onMounted(() => {
     url: `${store.API_URL}/api/v1/articles/${route.params.id}/`,
   })
     .then((res) => {
-      article.value = res.data;
-      checkRecommendStatus();
+      article.value = res.data
+      console.log(isRecommended.value)
+      checkRecommendStatus()
     })
     .catch((err) => {
       console.log(err);
@@ -72,18 +73,20 @@ const Recommend = async function (articleId) {
       method: "post",
       url: `${store.API_URL}/api/v1/articles/${articleId}/recommends/`,
       headers: {
-        Authorization: `Token ${store.token}`,
-      },
-    });
-    isRecommended.value = !isRecommended.value;
-    recommendCount.value = response.data.recommend_count;
+        Authorization: `Token ${store.token}`
+      }
+    })
+    isRecommended.value = !isRecommended.value
+    console.log(isRecommended.value)
+    recommendCount.value = response.data.recommend_count
 
     // 추천 상태 변경 후 게시글 정보 업데이트
     const articleResponse = await axios({
-      method: "get",
-      url: `${store.API_URL}/api/v1/articles/${articleId}/`,
-    });
-    article.value = articleResponse.data;
+      method: 'get',
+      url: `${store.API_URL}/api/v1/articles/${articleId}/`
+    })
+    article.value = articleResponse.data
+    console.log(article.value)
   } catch (err) {
     console.log(err);
   }
