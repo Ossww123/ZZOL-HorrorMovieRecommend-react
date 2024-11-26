@@ -123,6 +123,7 @@
 import axios from "axios"; // axios import 추가
 import { ref } from "vue";
 import { useCounterStore } from "@/stores/counter";
+import { useRouter } from "vue-router";
 
 const username = ref(null);
 const email = ref(null);
@@ -130,6 +131,7 @@ const password1 = ref(null);
 const password2 = ref(null);
 const nickname = ref(null);
 const profileimage = ref(null); // 프로필 이미지 상태 변수 추가
+const router = useRouter()
 
 const errors = ref({
   username: null,
@@ -242,6 +244,7 @@ const signUp = async () => {
         // 'Content-Type'은 FormData를 사용할 때 자동으로 설정되므로 제거
       },
     });
+    router.push('/');
   } catch (error) {
     console.error(
       "Error during sign up:",

@@ -38,8 +38,7 @@
                   />
                 </div>
                 <div class="movie-info">
-                  <h3>{{ movie.title }}</h3>
-                  <p>평점: {{ movie.vote_average }}</p>
+                  <h3 class="text-center font-bold">{{ movie.title }}</h3>
                 </div>
               </div>
             </div>

@@ -160,11 +160,7 @@ export const useCounterStore = defineStore(
     const getMovies = () => {
       // axios 는 Promise 객체와 동일하게 활용한다.
       axios
-        .get(`${API_URL}/api/v1/movies/`, {
-          headers: {
-            Authorization: `Token ${token.value}`,
-          },
-        })
+        .get(`${API_URL}/api/v1/movies/`)
         .then((response) => {
           console.log(response.data);
           // console.log('Movies fetched = ', response.data);
@@ -228,11 +224,7 @@ export const useCounterStore = defineStore(
 
     // 랜덤 영화
     const getRandomMovies = async () => {
-      const response = await axios.get(`${API_URL}/api/v1/random/`, {
-        headers: {
-          Authorization: `Token ${token.value}`,
-        },
-      });
+      const response = await axios.get(`${API_URL}/api/v1/random/`);
       return response.data;
     };
 
@@ -258,9 +250,6 @@ export const useCounterStore = defineStore(
     const getMovieList = async (sortBy) => {
       const response = await axios.get(`${API_URL}/api/v1/movielist/`, {
         params: { sort: sortBy },
-        headers: {
-          Authorization: `Token ${token.value}`,
-        },
       });
       switch (sortBy) {
         case "popularity":
