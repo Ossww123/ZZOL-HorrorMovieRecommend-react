@@ -89,15 +89,15 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useCounterStore } from "@/stores/counter";
-import { useRouter } from "vue-router"; // useRouter를 가져옴
+import { useRouter, useRoute } from "vue-router"; // useRouter를 가져옴
 import { debounce } from "lodash";
 
 // 스토어와 라우터 훅을 설정
 const store = useCounterStore();
 const router = useRouter(); // useRouter 훅으로 라우터 객체를 가져옴
-
+const route = useRoute
 const searchQuery = ref(""); // 검색어 상태 변수
 
 // 검색 함수 (디바운스 적용)
@@ -111,6 +111,15 @@ const onSearch = debounce(() => {
     });
   }
 }, 500);
+
+onMounted(() => {
+  // 라우터 쿼리 파라미터에 "search"가 없을 경우에만 검색어를 초기화
+  if (!route.query.search) {
+    searchQuery.value = "";
+  }
+});
+
+
 
 // 로그아웃 함수
 const logOut = function () {
