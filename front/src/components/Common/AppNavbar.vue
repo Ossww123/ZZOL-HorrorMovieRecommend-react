@@ -97,7 +97,7 @@ import { debounce } from "lodash";
 // 스토어와 라우터 훅을 설정
 const store = useCounterStore();
 const router = useRouter(); // useRouter 훅으로 라우터 객체를 가져옴
-const route = useRoute
+const route = useRoute()
 const searchQuery = ref(""); // 검색어 상태 변수
 
 // 검색 함수 (디바운스 적용)
