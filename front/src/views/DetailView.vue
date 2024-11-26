@@ -55,17 +55,17 @@
 </template>
 
 <script setup>
-import axios from "axios";
-import { onMounted, ref } from "vue";
-import { useCounterStore } from "@/stores/counter";
-import { useRoute } from "vue-router";
-import ArticleCommentList from "@/components/ArticleCommentList.vue";
+import axios from 'axios'
+import { onMounted, ref } from 'vue'
+import { useCounterStore } from '@/stores/counter'
+import { useRoute } from 'vue-router'
+import ArticleCommentList from '@/components/ArticleCommentList.vue'
 
-const store = useCounterStore();
-const route = useRoute();
-const article = ref(null);
-const isRecommended = ref(false);
-const recommendCount = ref(0);
+const store = useCounterStore()
+const route = useRoute()
+const article = ref(null)
+const isRecommended = ref(false)
+const recommendCount = ref(0)
 
 // 날짜 포맷팅 함수
 const formatDate = (dateString) => {
@@ -76,23 +76,23 @@ const formatDate = (dateString) => {
 // 게시글 조회
 onMounted(() => {
   axios({
-    method: "get",
-    url: `${store.API_URL}/api/v1/articles/${route.params.id}/`,
+    method: 'get',
+    url: `${store.API_URL}/api/v1/articles/${route.params.id}/`
   })
     .then((res) => {
       article.value = res.data;
       checkRecommendStatus();
     })
     .catch((err) => {
-      console.log(err);
-    });
-});
+      console.log(err)
+    })
+})
 
 // 추천하기
-const Recommend = async function (articleId) {
+const Recommend = async function(articleId) {
   try {
     const response = await axios({
-      method: "post",
+      method: 'post',
       url: `${store.API_URL}/api/v1/articles/${articleId}/recommends/`,
       headers: {
         Authorization: `Token ${store.token}`,
@@ -108,17 +108,17 @@ const Recommend = async function (articleId) {
     });
     article.value = articleResponse.data;
   } catch (err) {
-    console.log(err);
+    console.log(err)
   }
-};
+}
 
 // 추천 상태 확인
 const checkRecommendStatus = () => {
   if (article.value && article.value.recommend_users) {
-    isRecommended.value = article.value.recommend_users.includes(store.user_id);
-    recommendCount.value = article.value.recommend_users.length;
+    isRecommended.value = article.value.recommend_users.includes(store.user_id)
+    recommendCount.value = article.value.recommend_users.length
   }
-};
+}
 </script>
 
 <style scoped>

@@ -530,7 +530,7 @@ def random_review(request, tmdb_id):
     
     elif request.method == 'POST':
         if Review.objects.filter(user=request.user, movie=movie).exists():
-            return Response({'error' : '나가 임마'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error' : '너. 거기까지. '}, status=status.HTTP_400_BAD_REQUEST)
         
         if check_spoiler(request.data['content']):
             return Response({'error': '스포일러가 포함된 리뷰는 작성할 수 없습니다'}, 
