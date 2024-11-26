@@ -56,7 +56,14 @@ async function handleRecommend() {
       "http://localhost:8000/api/v1/recommend/",
       { user_input: userInput.value }
     );
-    movies.value = response.data.movies;
+
+    // 응답 데이터가 빈 배열일 경우
+    if (response.data.movies.length === 0) {
+      error.value =
+        "AI 서비스에 오류가 발생했거나 더 명확한 설명이 필요합니다. 다시 시도해주세요.";
+    } else {
+      movies.value = response.data.movies;
+    }
   } catch (err) {
     error.value =
       err.response?.data?.error || "영화 추천 중 오류가 발생했습니다.";
