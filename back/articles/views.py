@@ -80,9 +80,9 @@ def article_list(request):
         articles = Article.objects.all()
         top_articles = articles.annotate(
         recommend_count=Count('recommend_users')
-        ).order_by('-recommend_count')[:5]
+        ).order_by('-recommend_count')[:3]
         
-        # 나머지 게시글 최신순 정렬 (상위 5개 제외)
+        # 나머지 게시글 최신순 정렬 (상위 3개 제외)
         remaining_articles = articles.exclude(
             id__in=top_articles.values_list('id', flat=True)
         ).order_by('-created_at')

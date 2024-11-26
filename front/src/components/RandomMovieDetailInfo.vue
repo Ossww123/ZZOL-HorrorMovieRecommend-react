@@ -78,7 +78,7 @@
           <img
             :src="directors[directorId].profile_path 
                     ? `https://image.tmdb.org/t/p/w200${directors[directorId].profile_path}`
-                    : require('@/assets/default-profile.png')"
+                    :defaultProfile"
             :alt="directors[directorId].name"
             class="w-20 h-20 rounded-full object-cover"
           />
@@ -97,7 +97,7 @@
           <img
             :src="actors[actorId].profile_path
                     ? `https://image.tmdb.org/t/p/w200${actors[actorId].profile_path}`
-                    : require('@/assets/default-profile.png')"
+                    :defaultProfile"
             :alt="actors[actorId].name"
             class="w-20 h-20 rounded-full object-cover"
           />
@@ -190,7 +190,8 @@
   import { onMounted, computed, ref, watch } from "vue";
   import YoutubeTrailerModal from "./YoutubeTrailerModal.vue";
   import RandomMovieDetailReview from "@/components/RandomMovieDetailReview.vue";
-  
+  import defaultProfile from '@/assets/default-profile.png';
+
   const store = useCounterStore();
   const route = useRoute();
   const movieId = route.params.movie_id;
@@ -239,7 +240,8 @@
     console.log(keywords.value);
   };
   
-  const getDirector = async (directorId) => {
+  const getDirector = async (directorIds) => {
+    for (const directorId of directorIds) {
       const response = await axios.get(`${store.API_URL}/api/v1/directors/${directorId}/`, {
         headers: {
           Authorization: `Token ${store.token}`
@@ -247,6 +249,7 @@
       })
       directors.value[directorId] = response.data
   }
+}
   
   const getActor = async (actorIds) => {
     for (const actorId of actorIds) {
