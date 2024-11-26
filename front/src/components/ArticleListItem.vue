@@ -14,7 +14,7 @@
     
     <div class="article-footer">
       <div class="article-info">
-        <span class="author">작성자: {{ article.user }}</span>
+        <span class="author">작성자: {{ article.user.nickname }}</span> <!-- nickname으로 수정 -->
         <span class="date">{{ formatDate(article.created_at) }}</span>
       </div>
       <RouterLink 
