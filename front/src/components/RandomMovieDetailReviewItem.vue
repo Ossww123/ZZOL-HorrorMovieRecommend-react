@@ -43,7 +43,7 @@
           <img
             v-for="i in 10"
             :key="'ghost-' + i"
-            :src="getGhostImage(review.rate, i)"
+            :src="getGhostImage(review.fear_score, i)"
             alt="ghost"
             class="star-icon"
           />
