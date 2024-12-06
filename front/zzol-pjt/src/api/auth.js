@@ -17,12 +17,13 @@ const API_URL = "http://127.0.0.1:8000/accounts";
 export const signUpUser = async (formData) => {
   try {
     const response = await axios.post(`${API_URL}/signup/`, formData, {
-      header: {
+      headers: {
         Accept: "application/json",
       },
     });
     return response.data; // 응답 데이터 반환
   } catch (error) {
+    console.error("API request failed:", error.response || error);
     throw error; // 오류처리
   }
 };
@@ -33,6 +34,7 @@ export const loginUser = async (loginData) => {
     const response = await axios.post(`${API_URL}/login/`, loginData);
     return response.data; // 응답 데이터 반환
   } catch (error) {
+    console.error("API request failed:", error.response || error);
     throw error; // 오류처리
   }
 };

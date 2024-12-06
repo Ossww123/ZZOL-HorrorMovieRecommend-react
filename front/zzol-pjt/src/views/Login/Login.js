@@ -1,16 +1,41 @@
+// src/views/Login/Login.js
+
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // useHistory -> useNavigate
-import { loginUser } from "../../api/auth"; // 로그인 API 요청을 위한 함수
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../api/auth";
+import { useAuth } from "../../context/AuthContext"; // AuthContext import
 
 function Login() {
-  const [username, setUsername] = useState(""); // 사용자 이름 상태
-  const [password, setPassword] = useState(""); // 비밀번호 상태
-  const [isSubmitting, setIsSubmitting] = useState(false); // 로딩 상태
-  const navigate = useNavigate(); // 리디렉션을 위한 navigate 객체
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({}); // 에러 메시지 상태 추가
+  const navigate = useNavigate();
+  const { login } = useAuth(); // 로그인 함수 가져오기
 
-  // 로그인 처리 함수
+  // 입력값 검증 함수
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    if (!username) {
+      newErrors.username = "Username을 입력하세요.";
+      isValid = false;
+    }
+    if (!password) {
+      newErrors.password = "Password을 입력하세요.";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const logInHandler = async (e) => {
-    e.preventDefault(); // 기본 폼 제출 방지
+    e.preventDefault();
+
+    // 입력값 검증
+    if (!validateForm()) return;
 
     const payload = {
       username,
@@ -20,15 +45,14 @@ function Login() {
     setIsSubmitting(true);
 
     try {
-      const response = await loginUser(payload); // 로그인 API 호출
-      localStorage.setItem("token", response.key); // 로그인 성공 시 토큰 저장
-
-      // 홈 페이지로 리디렉션
-      navigate("/"); // history.push -> navigate
+      const response = await loginUser(payload);
+      login(response.key); // 로그인 후 token을 AuthContext에 저장
+      navigate("/"); // 홈 페이지로 리디렉션
     } catch (error) {
       console.error("Login failed:", error.response ? error.response.data : error);
+      setErrors({ general: "로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요." }); // 에러 메시지 설정
     } finally {
-      setIsSubmitting(false); // 제출 후 로딩 상태 해제
+      setIsSubmitting(false);
     }
   };
 
@@ -36,34 +60,36 @@ function Login() {
     <div className="login-container">
       <h1 className="text-2xl font-bold">LogIn</h1>
       <form onSubmit={logInHandler}>
-        {/* Username */}
         <div>
           <label htmlFor="username">Username: </label>
           <input
             type="text"
             id="username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)} // 입력값 관리
+            onChange={(e) => setUsername(e.target.value)}
+            className={errors.username ? "input-error" : ""}
           />
+          {errors.username && <p className="text-red-500">{errors.username}</p>} {/* 에러 메시지 표시 */}
         </div>
 
-        {/* Password */}
         <div>
           <label htmlFor="password">Password: </label>
           <input
             type="password"
             id="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)} // 입력값 관리
+            onChange={(e) => setPassword(e.target.value)}
+            className={errors.password ? "input-error" : ""}
           />
+          {errors.password && <p className="text-red-500">{errors.password}</p>} {/* 에러 메시지 표시 */}
         </div>
 
-        {/* Submit Button */}
-        <button type="submit" disabled={isSubmitting}>
-          Log In
+        {errors.general && <p className="text-red-500">{errors.general}</p>} {/* 로그인 실패 메시지 */}
+
+        <button type="submit" disabled={isSubmitting} className="btn-login">
+          {isSubmitting ? "로그인 중..." : "Log In"}
         </button>
 
-        {/* 로딩 스피너 */}
         {isSubmitting && <div className="spinner">Loading...</div>}
       </form>
     </div>
