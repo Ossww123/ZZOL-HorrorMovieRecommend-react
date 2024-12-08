@@ -14,6 +14,8 @@ import SignUp from "./views/SignUp/SignUp";
 import Home from "./views/Home/Home"; // Home 컴포넌트 추가
 import { AuthProvider, useAuth } from "./context/AuthContext"; // AuthContext 가져오기
 import Posts from "./views/Posts/Posts";
+import CreateArticle from "./views/CreateArticle/CreateArticle";
+import ArticleDetail from "./views/ArticleDetail/ArticleDetail";
 
 // 로그인 또는 회원가입 페이지에 접근하려고 할 때, 이미 로그인된 상태라면 리디렉션 처리
 const ProtectedRoute = ({ element }) => {
@@ -37,6 +39,8 @@ function App() {
             element={<ProtectedRoute element={<SignUp />} />} // 회원가입 페이지 접근 보호
           />
           <Route path="/articles" element={<Posts />} />
+          <Route path="/articles/new" element={<CreateArticle />} />
+          <Route path="/articles/:id" element={<ArticleDetail />} />
         </Routes>
       </Router>
     </AuthProvider>
